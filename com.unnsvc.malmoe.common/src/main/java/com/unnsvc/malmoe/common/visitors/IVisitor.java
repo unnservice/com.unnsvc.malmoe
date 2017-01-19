@@ -12,5 +12,6 @@ public interface IVisitor {
 	 * @param malmoeResolverConfig
 	 */
 	public void visitable(IVisitable visitable);
-
+	
+	public IVisitor newVisitor();
 }

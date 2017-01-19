@@ -1,3 +1,4 @@
+
 package com.unnsvc.malmoe.repository.config;
 
 import java.net.URL;
@@ -18,6 +19,12 @@ public class MalmoeResolverConfig implements IResolverConfig {
 	public void visit(IVisitor visitor) {
 
 		visitor.visitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "resolver:malmoe" + (attrs ? " url=\"" + url + "\"" : "");
 	}
 
 }

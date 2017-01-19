@@ -48,7 +48,13 @@ public class RepositoriesConfig implements IVisitable {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		repositoryConfigs.forEach(repositoryConfig -> repositoryConfig.visit(visitor));
+		repositoryConfigs.forEach(repositoryConfig -> repositoryConfig.visit(visitor.newVisitor()));
 		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "repositories";
 	}
 }

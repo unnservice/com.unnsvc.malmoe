@@ -31,7 +31,15 @@ public class ProxyChainConfig implements IVisitable {
 	@Override
 	public void visit(IVisitor visitor) {
 
-		visitor.visitable(this);
+		visitor.startVisitable(this);
+		repositoryReferences.forEach(repositoryReference -> repositoryReference.visit(visitor.newVisitor()));
+		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "proxyChain";
 	}
 
 }

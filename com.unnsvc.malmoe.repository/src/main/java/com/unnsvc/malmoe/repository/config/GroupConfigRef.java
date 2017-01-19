@@ -6,21 +6,27 @@ import com.unnsvc.malmoe.common.visitors.IVisitor;
 
 public class GroupConfigRef implements IGroupConfig {
 
-	private String groupName;
+	private String ref;
 
-	public GroupConfigRef(String groupName) {
+	public GroupConfigRef(String ref) {
 
-		this.groupName = groupName;
+		this.ref = ref;
 	}
 
 	public String getGroupName() {
 
-		return groupName;
+		return ref;
 	}
 
 	@Override
 	public void visit(IVisitor visitor) {
 
-		throw new UnsupportedOperationException("Not visitable");
+		visitor.visitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "group" + (attrs ? " ref=\"" + ref + "\"" : "");
 	}
 }

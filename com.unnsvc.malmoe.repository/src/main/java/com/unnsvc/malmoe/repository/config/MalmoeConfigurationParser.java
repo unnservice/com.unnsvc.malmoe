@@ -15,7 +15,6 @@ import org.xml.sax.SAXException;
 import com.unnsvc.malmoe.common.IMalmoeConfiguration;
 import com.unnsvc.malmoe.common.MalmoeConstants;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
-import com.unnsvc.malmoe.common.visitors.ResolutionVisitor;
 import com.unnsvc.rhena.common.Utils;
 import com.unnsvc.rhena.common.exceptions.RhenaException;
 
@@ -33,7 +32,6 @@ public class MalmoeConfigurationParser implements IMalmoeConfiguration {
 
 			throw new RhenaException(e.getMessage(), e);
 		}
-		visit(new ResolutionVisitor());
 	}
 
 	private void parse(File repositoryConfigFile) throws ParserConfigurationException, SAXException, IOException {
@@ -48,7 +46,7 @@ public class MalmoeConfigurationParser implements IMalmoeConfiguration {
 
 			if (node.getLocalName().equals("identity")) {
 				identityConfig = new IdentityConfig(node);
-			} else if (node.getLocalName().equals("repository")) {
+			} else if (node.getLocalName().equals("repositories")) {
 				repositoryConfig = new RepositoriesConfig(node);
 			}
 		}
@@ -58,8 +56,15 @@ public class MalmoeConfigurationParser implements IMalmoeConfiguration {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		identityConfig.visit(visitor);
-		repositoryConfig.visit(visitor);
+		identityConfig.visit(visitor.newVisitor());
+		repositoryConfig.visit(visitor.newVisitor());
 		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "repository"
+				+ (attrs ? " xmlns=\"" + MalmoeConstants.NS_MALMOE_REPOSITORY + "\" xmlns:resolver=\"" + MalmoeConstants.NS_MALMOE_RESOLVER + "\"" : "");
 	}
 }

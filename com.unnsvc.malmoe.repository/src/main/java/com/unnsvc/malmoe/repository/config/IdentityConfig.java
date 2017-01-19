@@ -30,9 +30,14 @@ public class IdentityConfig implements IVisitable {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		groupConfig.visit(visitor);
-		usersConfig.visit(visitor);
+		groupConfig.visit(visitor.newVisitor());
+		usersConfig.visit(visitor.newVisitor());
 		visitor.endVisitable(this);
 	}
 
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "identity";
+	}
 }

@@ -3,9 +3,9 @@
 	<identity>
 		<groups>
 			<group name="testGroup">
-				<permission>artifact.read</permission>
-				<permission>artifact.write</permission>
-				<permission>artifact.overwrite</permission>
+				<permission id="artifact.read" />
+				<permission id="artifact.write" />
+				<permission id="artifact.overwrite" />
 			</group>
 		</groups>
 		<users>

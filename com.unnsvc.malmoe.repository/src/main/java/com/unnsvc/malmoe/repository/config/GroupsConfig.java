@@ -35,7 +35,13 @@ public class GroupsConfig implements IVisitable {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		groupConfigs.forEach(groupConfig -> groupConfig.visit(visitor));
+		groupConfigs.forEach(groupConfig -> groupConfig.visit(visitor.newVisitor()));
 		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "groups";
 	}
 }

@@ -1,3 +1,4 @@
+
 package com.unnsvc.malmoe.repository.config;
 
 import java.net.URL;
@@ -10,7 +11,7 @@ public class MavenResolverConfig implements IResolverConfig {
 	private URL url;
 
 	public MavenResolverConfig(URL url) {
-		
+
 		this.url = url;
 	}
 
@@ -18,6 +19,12 @@ public class MavenResolverConfig implements IResolverConfig {
 	public void visit(IVisitor visitor) {
 
 		visitor.visitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "resolver:maven" + (attrs ? " url=\"" + url + "\"" : "");
 	}
 
 }

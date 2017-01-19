@@ -38,4 +38,10 @@ public class UserConfig implements IVisitable {
 		visitor.visitable(this);
 	}
 
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "user" + (attrs ? " username=\"" + username + "\" password=\"" + password + "\"" : "");
+	}
+
 }

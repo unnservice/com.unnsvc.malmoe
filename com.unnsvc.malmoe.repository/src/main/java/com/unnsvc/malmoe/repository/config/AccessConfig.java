@@ -31,7 +31,15 @@ public class AccessConfig implements IVisitable {
 	@Override
 	public void visit(IVisitor visitor) {
 
-		visitor.visitable(this);
+		visitor.startVisitable(this);
+		groupConfigs.forEach(groupConfig -> groupConfig.visit(visitor.newVisitor()));
+		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "access";
 	}
 
 }

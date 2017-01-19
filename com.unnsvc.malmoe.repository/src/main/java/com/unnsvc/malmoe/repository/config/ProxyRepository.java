@@ -32,9 +32,15 @@ public class ProxyRepository implements IRepositoryConfig {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		accessConfig.visit(visitor);
-		proxyChainConfig.visit(visitor);
+		accessConfig.visit(visitor.newVisitor());
+		proxyChainConfig.visit(visitor.newVisitor());
 		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "proxy" + (attrs ? " name=\"" + name + "\"" : "");
 	}
 
 }

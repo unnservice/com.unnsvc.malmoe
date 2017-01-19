@@ -23,7 +23,8 @@ public class GroupConfig implements IGroupConfig {
 		for (Node child : Utils.getNodeChildren(node)) {
 			if (child.getLocalName().equals("permission")) {
 
-				permissionConfigs.add(new PermissionConfig(child.getTextContent().trim()));
+				String id = child.getAttributes().getNamedItem("id").getNodeValue();
+				permissionConfigs.add(new PermissionConfig(id));
 			}
 		}
 	}
@@ -41,9 +42,14 @@ public class GroupConfig implements IGroupConfig {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		permissionConfigs.forEach(permissionConfig -> permissionConfig.visit(visitor));
+		permissionConfigs.forEach(permissionConfig -> permissionConfig.visit(visitor.newVisitor()));
 		visitor.endVisitable(this);
 	}
 
+	@Override
+	public String serialise(boolean attr) {
+
+		return "group" + (attr ? " name=\"" + nodeName + "\"" : "");
+	}
 
 }

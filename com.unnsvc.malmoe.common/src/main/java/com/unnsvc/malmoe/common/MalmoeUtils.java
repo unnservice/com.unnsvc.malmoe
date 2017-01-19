@@ -7,7 +7,7 @@ public class MalmoeUtils {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < nr; i++) {
-			sb.append(" ");
+			sb.append("   ");
 		}
 		return sb.toString();
 	}

@@ -30,12 +30,12 @@ public class VirtualRepository implements IRepositoryConfig {
 			if (child.getNamespaceURI().equals(MalmoeConstants.NS_MALMOE_RESOLVER)) {
 
 				URL url = new URL(child.getAttributes().getNamedItem("url").getNodeValue());
-				if(child.getLocalName().equals("malmoe")) {
-					
+				if (child.getLocalName().equals("malmoe")) {
+
 					IResolverConfig resolver = new MalmoeResolverConfig(url);
 					resolverConfigs.add(resolver);
 				} else if (child.getLocalName().equals("maven")) {
-					
+
 					IResolverConfig resolver = new MavenResolverConfig(url);
 					resolverConfigs.add(resolver);
 				}
@@ -50,9 +50,15 @@ public class VirtualRepository implements IRepositoryConfig {
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
-		accessConfig.visit(visitor);
-		resolverConfigs.forEach(resolverConfig -> resolverConfig.visit(visitor));
+		accessConfig.visit(visitor.newVisitor());
+		resolverConfigs.forEach(resolverConfig -> resolverConfig.visit(visitor.newVisitor()));
 		visitor.endVisitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "virtualRepository" + (attrs ? " name=\"" + name + "\"" : "");
 	}
 
 }

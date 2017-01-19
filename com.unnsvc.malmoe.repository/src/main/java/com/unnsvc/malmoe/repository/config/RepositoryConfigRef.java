@@ -1,3 +1,4 @@
+
 package com.unnsvc.malmoe.repository.config;
 
 import com.unnsvc.malmoe.common.config.IRepositoryConfig;
@@ -15,7 +16,13 @@ public class RepositoryConfigRef implements IRepositoryConfig {
 	@Override
 	public void visit(IVisitor visitor) {
 
-		throw new UnsupportedOperationException("Can't visit references");
+		visitor.visitable(this);
+	}
+
+	@Override
+	public String serialise(boolean attrs) {
+
+		return "repository" + (attrs ? " ref=\"" + name + "\"" : "");
 	}
 
 }
