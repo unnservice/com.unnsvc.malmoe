@@ -1,0 +1,42 @@
+<repository xmlns="urn:malmoe:repository" xmlns:resolver="urn:malmoe:resolver">
+
+	<identity>
+		<groups>
+			<group name="testGroup">
+				<permission>artifact.read</permission>
+				<permission>artifact.write</permission>
+				<permission>artifact.overwrite</permission>
+			</group>
+		</groups>
+		<users>
+			<user username="test" password="encoded">
+				<group ref="testGroup" />
+			</user>
+		</users>
+	</identity>
+
+	<repositories>
+		<proxyRepository name="main">
+			<access>
+				<group ref="testGroup" />
+			</access>
+			<proxyChain>
+				<repository ref="custom" />
+			</proxyChain>
+		</proxyRepository>
+		<!-- these will download and save artifacts into their own locations -->
+		<virtualRepository name="customMaven">
+			<access>
+				<group ref="testGroup" />
+			</access>
+			<resolver:maven url="http://someMavenLocation/" />
+		</virtualRepository>
+		<virtualRepository name="customMalmoe">
+			<access>
+				<group ref="testGroup" />
+			</access>
+			<resolver:malmoe url="http://someMalmoeLocation/" />
+		</virtualRepository>
+	</repositories>
+
+</repository>
