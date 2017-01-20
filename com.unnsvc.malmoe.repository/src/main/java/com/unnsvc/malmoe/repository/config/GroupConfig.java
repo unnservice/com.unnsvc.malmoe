@@ -14,14 +14,14 @@ import com.unnsvc.rhena.common.Utils;
 
 public class GroupConfig implements IGroupConfig {
 
-	private String nodeName;
+	private String groupName;
 
 	private Set<IPermissionConfig> permissionConfigs;
 
 	public GroupConfig(Node node) {
 
 		this.permissionConfigs = new HashSet<IPermissionConfig>();
-		nodeName = node.getAttributes().getNamedItem("name").getNodeValue();
+		groupName = node.getAttributes().getNamedItem("name").getNodeValue();
 		for (Node child : Utils.getNodeChildren(node)) {
 			if (child.getLocalName().equals("permission")) {
 
@@ -36,6 +36,12 @@ public class GroupConfig implements IGroupConfig {
 	}
 
 	@Override
+	public String getGroupName() {
+
+		return groupName;
+	}
+
+	@Override
 	public void visit(IVisitor visitor) {
 
 		visitor.startVisitable(this);
@@ -46,7 +52,7 @@ public class GroupConfig implements IGroupConfig {
 	@Override
 	public String serialise(boolean attr) {
 
-		return "group" + (attr ? " name=\"" + nodeName + "\"" : "");
+		return "group" + (attr ? " name=\"" + groupName + "\"" : "");
 	}
 
 	@Override

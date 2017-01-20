@@ -12,7 +12,7 @@ public class TestPasswordOperations {
 		PasswordOperations po = new PasswordOperations(256, 100);
 		String salt = po.generateEncodedSalt();
 		String password = po.hashPassword("password", salt);
-		System.err.println("For reference: " + password + ":" + salt);
+		System.err.println("For reference, password:" + password + " salt: " + salt);
 
 		Assert.assertTrue(po.verifyPassword("password", salt, po.hashPassword("password", salt)));
 	}

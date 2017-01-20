@@ -41,7 +41,7 @@ public class AccessManager implements IAccessManager {
 
 			return iAccess.execute();
 		}
-		throw new AccessException("Access denied " + permissions);
+		throw new AccessException("Access denied, required permissions: " + Arrays.toString(permissions));
 	}
 
 	private boolean hasPermissions(IUser user, String[] permissions) {
@@ -53,7 +53,7 @@ public class AccessManager implements IAccessManager {
 			if (user.isInGroup(groupRef.getRef())) {
 				for (IGroupConfig groupConfig : identityManager.getGroupsConfig()) {
 
-					if (groupConfig.equals(groupRef.getRef())) {
+					if (groupConfig.getGroupName().equals(groupRef.getRef())) {
 
 						for (IPermissionConfig permissionConfig : groupConfig) {
 

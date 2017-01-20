@@ -26,7 +26,7 @@ public class TestRepositoryManager {
 		debugConfig(config);
 
 		IIdentityManager identityManager = new IdentityManager(config.getIdentityConfig());
-		IUser user = identityManager.authenticate("test", "password");
+		IUser user = identityManager.authenticate("admin", "password");
 
 		RetrievalRequest request = new RetrievalRequest(user, "main", ModuleIdentifier.valueOf("com.test:something:0.0.1"), EExecutionType.TEST);
 
