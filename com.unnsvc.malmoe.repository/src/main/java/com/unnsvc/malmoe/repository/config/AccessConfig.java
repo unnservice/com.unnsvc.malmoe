@@ -2,6 +2,7 @@
 package com.unnsvc.malmoe.repository.config;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.w3c.dom.Node;
@@ -40,6 +41,12 @@ public class AccessConfig implements IAccessConfig {
 	public String serialise(boolean attrs) {
 
 		return "access";
+	}
+
+	@Override
+	public Iterator<IReference> iterator() {
+
+		return groupConfigs.iterator();
 	}
 
 }

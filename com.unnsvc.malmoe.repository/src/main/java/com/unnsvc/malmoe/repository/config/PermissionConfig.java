@@ -1,10 +1,10 @@
 
 package com.unnsvc.malmoe.repository.config;
 
-import com.unnsvc.malmoe.common.visitors.IVisitable;
+import com.unnsvc.malmoe.common.config.IPermissionConfig;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 
-public class PermissionConfig implements IVisitable {
+public class PermissionConfig implements IPermissionConfig {
 
 	private String id;
 
@@ -13,6 +13,7 @@ public class PermissionConfig implements IVisitable {
 		this.id = id;
 	}
 
+	@Override
 	public String getId() {
 
 		return id;

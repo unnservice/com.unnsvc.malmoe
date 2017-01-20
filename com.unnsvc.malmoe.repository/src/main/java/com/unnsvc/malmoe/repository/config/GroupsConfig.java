@@ -2,21 +2,23 @@
 package com.unnsvc.malmoe.repository.config;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.w3c.dom.Node;
 
-import com.unnsvc.malmoe.common.visitors.IVisitable;
+import com.unnsvc.malmoe.common.config.IGroupConfig;
+import com.unnsvc.malmoe.common.config.IGroupsConfig;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
-public class GroupsConfig implements IVisitable {
+public class GroupsConfig implements IGroupsConfig {
 
-	private List<GroupConfig> groupConfigs;
+	private List<IGroupConfig> groupConfigs;
 
 	public GroupsConfig(Node node) {
 
-		groupConfigs = new ArrayList<GroupConfig>();
+		groupConfigs = new ArrayList<IGroupConfig>();
 		for (Node child : Utils.getNodeChildren(node)) {
 
 			if (child.getLocalName().equals("group")) {
@@ -24,11 +26,6 @@ public class GroupsConfig implements IVisitable {
 				groupConfigs.add(groupConfig);
 			}
 		}
-	}
-
-	public List<GroupConfig> getGroupConfigs() {
-
-		return groupConfigs;
 	}
 
 	@Override
@@ -43,5 +40,11 @@ public class GroupsConfig implements IVisitable {
 	public String serialise(boolean attrs) {
 
 		return "groups";
+	}
+
+	@Override
+	public Iterator<IGroupConfig> iterator() {
+
+		return groupConfigs.iterator();
 	}
 }

@@ -3,14 +3,16 @@ package com.unnsvc.malmoe.repository.config;
 
 import org.w3c.dom.Node;
 
+import com.unnsvc.malmoe.common.config.IGroupsConfig;
 import com.unnsvc.malmoe.common.config.IIdentityConfig;
+import com.unnsvc.malmoe.common.config.IUsersConfig;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
 public class IdentityConfig implements IIdentityConfig {
 
-	private GroupsConfig groupConfig;
-	private UsersConfig usersConfig;
+	private IGroupsConfig groupConfig;
+	private IUsersConfig usersConfig;
 
 	public IdentityConfig(Node node) {
 
@@ -24,6 +26,18 @@ public class IdentityConfig implements IIdentityConfig {
 				usersConfig = new UsersConfig(child);
 			}
 		}
+	}
+
+	@Override
+	public IGroupsConfig getGroupConfig() {
+
+		return groupConfig;
+	}
+
+	@Override
+	public IUsersConfig getUsersConfig() {
+
+		return usersConfig;
 	}
 
 	@Override

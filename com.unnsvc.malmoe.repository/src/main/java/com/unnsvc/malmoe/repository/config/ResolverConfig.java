@@ -28,7 +28,7 @@ public class ResolverConfig implements IResolverConfig {
 
 		return resolverName;
 	}
-	
+
 	@Override
 	public URL getUrl() {
 
@@ -38,6 +38,6 @@ public class ResolverConfig implements IResolverConfig {
 	@Override
 	public String serialise(boolean attrs) {
 
-		return "resolver:malmoe" + (attrs ? " url=\"" + url + "\"" : "");
+		return "resolver" + (attrs ? " name=\"" + resolverName + "\" url=\"" + url + "\"" : "");
 	}
 }

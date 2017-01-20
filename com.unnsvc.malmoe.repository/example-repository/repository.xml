@@ -9,7 +9,7 @@
 			</group>
 		</groups>
 		<users>
-			<user username="test" password="encoded">
+			<user username="admin" password="BVZfi2WIUnWOVHgrMQU7ZifhRzL9WiLiEybUf1cgKqY=" salt="0/8OvHBfZAkDhT6NQAqlag==">
 				<group ref="testGroup" />
 			</user>
 		</users>

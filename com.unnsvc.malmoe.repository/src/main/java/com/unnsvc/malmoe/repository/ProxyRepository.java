@@ -30,7 +30,7 @@ public class ProxyRepository implements IMalmoeRepository {
 	@Override
 	public IRetrievalResult retrieveModule(IRetrievalRequest request) throws MalmoeException {
 
-		return accessManager.withPermissions(new IAccess<IRetrievalResult>() {
+		return accessManager.withPermissions(request, new IAccess<IRetrievalResult>() {
 
 			public IRetrievalResult execute() throws MalmoeException {
 
@@ -47,7 +47,7 @@ public class ProxyRepository implements IMalmoeRepository {
 
 				return new NotFoundRetrievalResult();
 			}
-		}, "repository.read");
+		}, IMalmoeRepository.ACCESS_REPOSITORY_READ);
 	}
 
 }
