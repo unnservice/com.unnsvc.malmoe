@@ -1,4 +1,5 @@
-<repository xmlns="urn:malmoe:repository">
+<?xml version="1.0" encoding="utf-8"?>
+<repository xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:malmoe:repository" xsi:schemaLocation="urn:malmoe:repository http://schema.unnsvc.com/malmoe/repository.xsd">
 
 	<identity>
 		<groups>
@@ -19,7 +20,8 @@
 				<group ref="testGroup" />
 			</access>
 			<proxyChain>
-				<repository ref="custom" />
+				<repository ref="customMalmoe" />
+				<repository ref="customMaven" />
 			</proxyChain>
 		</proxyRepository>
 		<!-- these will download and save artifacts into their own locations -->

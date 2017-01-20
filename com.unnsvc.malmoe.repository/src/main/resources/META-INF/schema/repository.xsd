@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:malmoe:repository" xmlns:tns="urn:malmoe:repository" elementFormDefault="qualified">
+
+	<xs:complexType name="permissionType">
+		<xs:attribute name="id" use="required" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="groupType">
+		<xs:sequence>
+			<xs:element name="permission" type="tns:permissionType" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="name" use="required" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="userType">
+		<xs:sequence>
+			<xs:element name="group" type="tns:refType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="username" use="required" type="xs:string" />
+		<xs:attribute name="password" use="required" type="xs:string" />
+		<xs:attribute name="salt" use="required" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="identityType">
+		<xs:sequence>
+			<xs:element name="groups" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="group" type="tns:groupType" minOccurs="1" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="users" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="user" type="tns:userType" minOccurs="1" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="refType">
+		<xs:attribute name="ref" use="required" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="resolverType">
+		<xs:attribute name="name" use="required" type="xs:string" />
+		<xs:attribute name="url" use="required" type="xs:anyURI" />
+	</xs:complexType>
+
+	<xs:complexType name="proxyRepositoryType">
+		<xs:sequence>
+			<xs:element name="access" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="group" type="tns:refType" minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="proxyChain" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="repository" type="tns:refType" minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="virtualRepositoryType">
+		<xs:sequence>
+			<xs:element name="access" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="group" type="tns:refType" minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="resolver" type="tns:resolverType" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="name" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="repositoriesType">
+		<xs:sequence>
+			<xs:element name="proxyRepository" type="tns:proxyRepositoryType" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="virtualRepository" type="tns:virtualRepositoryType" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="repository">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="identity" type="tns:identityType" minOccurs="1" maxOccurs="1" />
+				<xs:element name="repositories" type="tns:repositoriesType" minOccurs="1" maxOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

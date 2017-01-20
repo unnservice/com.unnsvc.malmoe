@@ -19,6 +19,6 @@ public class VirtualRepository implements IMalmoeRepository {
 
 	public IRetrievalResult retrieveModule(IRetrievalRequest request) {
 
-		throw new UnsupportedOperationException("Not implemented");
+		throw new UnsupportedOperationException("Virtual repository implemented");
 	}
 }

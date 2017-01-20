@@ -1,6 +1,7 @@
 
 package com.unnsvc.malmoe.repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class AccessManager implements IAccessManager {
 
 	private boolean hasPermissions(IUser user, String[] permissions) {
 
-		List<String> remainingPermissions = Arrays.asList(permissions);
+		List<String> remainingPermissions = new ArrayList<String>(Arrays.asList(permissions));
 
 		for (IReference groupRef : accessConfig) {
 
