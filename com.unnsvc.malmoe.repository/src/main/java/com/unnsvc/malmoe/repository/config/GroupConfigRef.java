@@ -1,10 +1,10 @@
 
 package com.unnsvc.malmoe.repository.config;
 
-import com.unnsvc.malmoe.common.config.IGroupConfig;
+import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 
-public class GroupConfigRef implements IGroupConfig {
+public class GroupConfigRef implements IReference {
 
 	private String ref;
 
@@ -13,7 +13,8 @@ public class GroupConfigRef implements IGroupConfig {
 		this.ref = ref;
 	}
 
-	public String getGroupName() {
+	@Override
+	public String getRef() {
 
 		return ref;
 	}

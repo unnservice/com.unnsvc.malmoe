@@ -1,4 +1,4 @@
-<repository xmlns="urn:malmoe:repository" xmlns:resolver="urn:malmoe:resolver">
+<repository xmlns="urn:malmoe:repository">
 
 	<identity>
 		<groups>
@@ -29,13 +29,13 @@
 			<access>
 				<group ref="testGroup" />
 			</access>
-			<resolver:maven url="http://someMavenLocation/" />
+			<resolver name="maven" url="http://someMavenLocation/" />
 		</virtualRepository>
 		<virtualRepository name="customMalmoe">
 			<access>
 				<group ref="testGroup" />
 			</access>
-			<resolver:malmoe url="http://someMalmoeLocation/" />
+			<resolver name="malmoe" url="http://someMalmoeLocation/" />
 		</virtualRepository>
 	</repositories>
 

@@ -1,10 +1,10 @@
 
 package com.unnsvc.malmoe.repository.config;
 
-import com.unnsvc.malmoe.common.config.IRepositoryConfig;
+import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 
-public class RepositoryConfigRef implements IRepositoryConfig {
+public class RepositoryConfigRef implements IReference {
 
 	private String name;
 
@@ -25,4 +25,9 @@ public class RepositoryConfigRef implements IRepositoryConfig {
 		return "repository" + (attrs ? " ref=\"" + name + "\"" : "");
 	}
 
+	@Override
+	public String getRef() {
+
+		return name;
+	}
 }

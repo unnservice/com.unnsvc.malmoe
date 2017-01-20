@@ -64,7 +64,18 @@ public class MalmoeConfigurationParser implements IMalmoeConfiguration {
 	@Override
 	public String serialise(boolean attrs) {
 
-		return "repository"
-				+ (attrs ? " xmlns=\"" + MalmoeConstants.NS_MALMOE_REPOSITORY + "\" xmlns:resolver=\"" + MalmoeConstants.NS_MALMOE_RESOLVER + "\"" : "");
+		return "repository" + (attrs ? " xmlns=\"" + MalmoeConstants.NS_MALMOE_REPOSITORY + "\"" : "");
+	}
+
+	@Override
+	public IdentityConfig getIdentityConfig() {
+
+		return identityConfig;
+	}
+
+	@Override
+	public RepositoriesConfig getRepositoriesConfig() {
+
+		return repositoryConfig;
 	}
 }

@@ -1,0 +1,53 @@
+
+package com.unnsvc.malmoe.repository;
+
+import com.unnsvc.malmoe.common.IAccess;
+import com.unnsvc.malmoe.common.IAccessManager;
+import com.unnsvc.malmoe.common.IIdentityManager;
+import com.unnsvc.malmoe.common.IMalmoeRepository;
+import com.unnsvc.malmoe.common.IRepositoryManager;
+import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IRetrievalResult;
+import com.unnsvc.malmoe.common.config.IReference;
+import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.repository.config.ProxyRepositoryConfig;
+import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
+import com.unnsvc.malmoe.repository.retrieval.ServedRetrievalResult;
+
+public class ProxyRepository implements IMalmoeRepository {
+
+	private ProxyRepositoryConfig proxyConfig;
+	private IRepositoryManager repositoryManager;
+	private IAccessManager accessManager;
+
+	public ProxyRepository(ProxyRepositoryConfig proxyConfig, IIdentityManager identityManager, IRepositoryManager repositoryManager) {
+
+		this.proxyConfig = proxyConfig;
+		this.accessManager = new AccessManager(proxyConfig.getAccessConfig(), identityManager);
+		this.repositoryManager = repositoryManager;
+	}
+
+	@Override
+	public IRetrievalResult retrieveModule(IRetrievalRequest request) throws MalmoeException {
+
+		return accessManager.withPermissions(new IAccess<IRetrievalResult>() {
+
+			public IRetrievalResult execute() throws MalmoeException {
+
+				for (IReference ref : proxyConfig.getProxyChainConfig()) {
+
+					IMalmoeRepository repo = repositoryManager.getRepository(ref.getRef());
+					if (repo != null) {
+						IRetrievalResult result = repo.retrieveModule(request);
+						if (result instanceof ServedRetrievalResult) {
+							return result;
+						}
+					}
+				}
+
+				return new NotFoundRetrievalResult();
+			}
+		}, "repository.read");
+	}
+
+}

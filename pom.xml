@@ -36,6 +36,8 @@
 		<module>com.unnsvc.malmoe.frontend</module>
 		<module>com.unnsvc.malmoe.common</module>
 		<module>com.unnsvc.malmoe.repository</module>
+		<module>com.unnsvc.malmoe.mavenResolver</module>
+		<module>com.unnsvc.malmoe.malmoeResolver</module>
 	</modules>
 
 	<dependencies>

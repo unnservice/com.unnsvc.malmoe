@@ -2,22 +2,23 @@
 package com.unnsvc.malmoe.repository.config;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.w3c.dom.Node;
 
-import com.unnsvc.malmoe.common.config.IRepositoryConfig;
-import com.unnsvc.malmoe.common.visitors.IVisitable;
+import com.unnsvc.malmoe.common.config.IProxyChainConfig;
+import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
-public class ProxyChainConfig implements IVisitable {
+public class ProxyChainConfig implements IProxyChainConfig {
 
-	private List<IRepositoryConfig> repositoryReferences;
+	private List<IReference> repositoryReferences;
 
 	public ProxyChainConfig(Node node) {
 
-		repositoryReferences = new ArrayList<IRepositoryConfig>();
+		repositoryReferences = new ArrayList<IReference>();
 		for (Node child : Utils.getNodeChildren(node)) {
 
 			if (child.getLocalName().equals("repository")) {
@@ -40,6 +41,12 @@ public class ProxyChainConfig implements IVisitable {
 	public String serialise(boolean attrs) {
 
 		return "proxyChain";
+	}
+
+	@Override
+	public Iterator<IReference> iterator() {
+
+		return repositoryReferences.iterator();
 	}
 
 }

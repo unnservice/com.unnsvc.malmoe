@@ -6,18 +6,18 @@ import java.util.Set;
 
 import org.w3c.dom.Node;
 
-import com.unnsvc.malmoe.common.config.IGroupConfig;
-import com.unnsvc.malmoe.common.visitors.IVisitable;
+import com.unnsvc.malmoe.common.config.IAccessConfig;
+import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
-public class AccessConfig implements IVisitable {
+public class AccessConfig implements IAccessConfig {
 
-	private Set<IGroupConfig> groupConfigs;
+	private Set<IReference> groupConfigs;
 
 	public AccessConfig(Node node) {
 
-		this.groupConfigs = new HashSet<IGroupConfig>();
+		this.groupConfigs = new HashSet<IReference>();
 		for (Node child : Utils.getNodeChildren(node)) {
 
 			if (child.getLocalName().equals("group")) {

@@ -3,17 +3,19 @@ package com.unnsvc.malmoe.repository.config;
 
 import org.w3c.dom.Node;
 
+import com.unnsvc.malmoe.common.config.IAccessConfig;
+import com.unnsvc.malmoe.common.config.IProxyChainConfig;
 import com.unnsvc.malmoe.common.config.IRepositoryConfig;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
-public class ProxyRepository implements IRepositoryConfig {
+public class ProxyRepositoryConfig implements IRepositoryConfig {
 
 	private String name;
-	private AccessConfig accessConfig;
+	private IAccessConfig accessConfig;
 	private ProxyChainConfig proxyChainConfig;
 
-	public ProxyRepository(Node node) {
+	public ProxyRepositoryConfig(Node node) {
 
 		this.name = node.getAttributes().getNamedItem("name").getNodeValue();
 		for (Node child : Utils.getNodeChildren(node)) {
@@ -40,7 +42,24 @@ public class ProxyRepository implements IRepositoryConfig {
 	@Override
 	public String serialise(boolean attrs) {
 
-		return "proxy" + (attrs ? " name=\"" + name + "\"" : "");
+		return "proxyRepository" + (attrs ? " name=\"" + name + "\"" : "");
+	}
+
+	@Override
+	public String getRepositoryName() {
+
+		return name;
+	}
+
+	@Override
+	public IAccessConfig getAccessConfig() {
+
+		return accessConfig;
+	}
+
+	public IProxyChainConfig getProxyChainConfig() {
+
+		return proxyChainConfig;
 	}
 
 }
