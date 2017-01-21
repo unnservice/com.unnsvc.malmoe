@@ -39,6 +39,7 @@
 		<module>com.unnsvc.malmoe.mavenResolver</module>
 		<module>com.unnsvc.malmoe.malmoeResolver</module>
 		<module>com.unnsvc.malmoe.docs</module>
+		<module>com.unnsvc.malmoe.client</module>
 	</modules>
 
 	<dependencies>

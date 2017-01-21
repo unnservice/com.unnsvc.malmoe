@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>com.unnsvc.malmoe.mavenResolver</artifactId>
+	<artifactId>com.unnsvc.malmoe.client</artifactId>
 
 	<parent>
 		<groupId>com.unnsvc.malmoe</groupId>
@@ -8,22 +8,15 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<repositories>
-		<repository>
-			<id>oss.sonatype.org</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
-			<groupId>com.tobedevoured.naether</groupId>
-			<artifactId>core</artifactId>
-			<version>0.15.3</version>
+			<groupId>com.unnsvc.malmoe</groupId>
+			<artifactId>com.unnsvc.malmoe.malmoeResolver</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.unnsvc.malmoe</groupId>
-			<artifactId>com.unnsvc.malmoe.repository</artifactId>
+			<artifactId>com.unnsvc.malmoe.mavenResolver</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

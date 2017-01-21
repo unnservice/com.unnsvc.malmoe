@@ -28,7 +28,7 @@ public class ProxyRepository implements IMalmoeRepository {
 	}
 
 	@Override
-	public IRetrievalResult retrieveModule(IRetrievalRequest request) throws MalmoeException {
+	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException {
 
 		return accessManager.withPermissions(request, new IAccess<IRetrievalResult>() {
 
@@ -38,7 +38,7 @@ public class ProxyRepository implements IMalmoeRepository {
 
 					IMalmoeRepository repo = repositoryManager.getRepository(ref.getRef());
 					if (repo != null) {
-						IRetrievalResult result = repo.retrieveModule(request);
+						IRetrievalResult result = repo.serveRequest(request);
 						if (result instanceof ServedRetrievalResult) {
 							return result;
 						}

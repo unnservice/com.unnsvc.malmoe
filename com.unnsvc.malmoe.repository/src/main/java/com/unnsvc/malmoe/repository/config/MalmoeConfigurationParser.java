@@ -25,11 +25,13 @@ import com.unnsvc.rhena.common.Utils;
 
 public class MalmoeConfigurationParser implements IMalmoeConfiguration {
 
+	private File workspaceDirectory;
 	private IdentityConfig identityConfig;
 	private RepositoriesConfig repositoryConfig;
 
 	public MalmoeConfigurationParser(File workspaceDirectory) throws MalmoeException {
 
+		this.workspaceDirectory = workspaceDirectory;
 		File repositoryConfigFile = new File(workspaceDirectory, MalmoeConstants.DEFAULT_REPOSITORY_FILENAME);
 		try {
 			parse(repositoryConfigFile);

@@ -4,7 +4,7 @@ import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 
 public interface IRepositoryManager {
 
-	public IRetrievalResult retrieveModule(IRetrievalRequest request) throws MalmoeException;
+	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException;
 
 	public IMalmoeRepository getRepository(String repositoryName) throws MalmoeException;
 

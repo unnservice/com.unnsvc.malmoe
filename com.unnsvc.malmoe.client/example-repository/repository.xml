@@ -20,22 +20,22 @@
 				<group ref="testGroup" />
 			</access>
 			<proxyChain>
-				<repository ref="customMalmoe" />
+				<!-- <repository ref="customMalmoe" /> -->
 				<repository ref="customMaven" />
 			</proxyChain>
 		</proxyRepository>
 		<!-- these will download and save artifacts into their own locations -->
+		<!-- <virtualRepository name="customMalmoe"> -->
+		<!-- <access> -->
+		<!-- <group ref="testGroup" /> -->
+		<!-- </access> -->
+		<!-- <resolver name="malmoe" url="http://someMalmoeLocation/" /> -->
+		<!-- </virtualRepository> -->
 		<virtualRepository name="customMaven">
 			<access>
 				<group ref="testGroup" />
 			</access>
-			<resolver name="maven" url="http://someMavenLocation/" />
-		</virtualRepository>
-		<virtualRepository name="customMalmoe">
-			<access>
-				<group ref="testGroup" />
-			</access>
-			<resolver name="malmoe" url="http://someMalmoeLocation/" />
+			<resolver name="maven" url="http://central.maven.org/maven2/" />
 		</virtualRepository>
 	</repositories>
 

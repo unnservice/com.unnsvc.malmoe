@@ -1,6 +1,8 @@
 
 package com.unnsvc.malmoe.mavenResolver;
 
+import java.io.File;
+
 import com.unnsvc.malmoe.common.config.IResolverConfig;
 import com.unnsvc.malmoe.resolver.IRemoteResolver;
 import com.unnsvc.malmoe.resolver.IRemoteResolverFactory;
@@ -14,9 +16,9 @@ public class MavenRemoteResolverFactory implements IRemoteResolverFactory {
 	}
 
 	@Override
-	public IRemoteResolver newRemoteResolver(IResolverConfig resolverConfig) {
+	public IRemoteResolver newRemoteResolver(IResolverConfig resolverConfig, File repositoryLocation) {
 
-		return new MavenRemoteResolver(resolverConfig);
+		return new MavenRemoteResolver(resolverConfig, repositoryLocation);
 	}
 
 }

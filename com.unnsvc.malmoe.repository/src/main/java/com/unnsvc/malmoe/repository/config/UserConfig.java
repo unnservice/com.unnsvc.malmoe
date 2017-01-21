@@ -11,6 +11,10 @@ import com.unnsvc.malmoe.common.config.IUserConfig;
 import com.unnsvc.malmoe.common.visitors.IVisitor;
 import com.unnsvc.rhena.common.Utils;
 
+/**
+ * 
+ * @author noname
+ */
 public class UserConfig implements IUserConfig {
 
 	private String username;
@@ -45,7 +49,7 @@ public class UserConfig implements IUserConfig {
 
 		return password;
 	}
-	
+
 	@Override
 	public String getSalt() {
 

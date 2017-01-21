@@ -11,7 +11,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.unnsvc.malmoe</groupId>
-			<artifactId>com.unnsvc.malmoe.common</artifactId>
+			<artifactId>com.unnsvc.malmoe.repository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

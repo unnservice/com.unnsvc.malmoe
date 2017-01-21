@@ -21,11 +21,13 @@ public class RetrievalRequest implements IRetrievalRequest {
 		this.type = type;
 	}
 
+	@Override
 	public ModuleIdentifier getIdentifier() {
 
 		return identifier;
 	}
 
+	@Override
 	public EExecutionType getType() {
 
 		return type;
