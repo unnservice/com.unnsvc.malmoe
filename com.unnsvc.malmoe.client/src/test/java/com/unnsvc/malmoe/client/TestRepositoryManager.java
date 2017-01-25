@@ -30,7 +30,7 @@ public class TestRepositoryManager {
 		IIdentityManager identityManager = new IdentityManager(config.getIdentityConfig());
 		IUser user = identityManager.authenticate("admin", "password");
 
-		RetrievalRequest request = new RetrievalRequest(user, "main", ModuleIdentifier.valueOf("com.test:something:0.0.1"), EExecutionType.TEST);
+		RetrievalRequest request = new RetrievalRequest(user, "main", ModuleIdentifier.valueOf("com.test:something:0.0.1"), EExecutionType.MAIN);
 
 		IRepositoryManager manager = new RepositoryManager(workspaceDirectory, identityManager, config.getRepositoriesConfig());
 		IRetrievalResult result = manager.serveRequest(request);
