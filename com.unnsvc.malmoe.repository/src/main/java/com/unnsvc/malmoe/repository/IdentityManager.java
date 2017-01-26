@@ -46,7 +46,7 @@ public class IdentityManager implements IIdentityManager {
 				String salt = userConfig.getSalt();
 				if (passwordOperations.verifyPassword(password, salt, passwordHash)) {
 
-					return new User(userConfig);
+					return new User(userConfig.getUsername(), userConfig.getGroupReferences());
 				} else {
 					throw new AccessException("Authentication failed");
 				}

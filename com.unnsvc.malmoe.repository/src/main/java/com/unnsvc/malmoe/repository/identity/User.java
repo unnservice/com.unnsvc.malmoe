@@ -5,17 +5,16 @@ import java.util.List;
 
 import com.unnsvc.malmoe.common.IUser;
 import com.unnsvc.malmoe.common.config.IReference;
-import com.unnsvc.malmoe.common.config.IUserConfig;
 
 public class User implements IUser {
 
 	private String username;
 	private List<IReference> groupRefs;
 
-	public User(IUserConfig userConfig) {
+	public User(String username, List<IReference> groupReferences) {
 
-		this.username = userConfig.getUsername();
-		this.groupRefs = userConfig.getGroupReferences();
+		this.username = username;
+		this.groupRefs = groupReferences;
 	}
 
 	@Override

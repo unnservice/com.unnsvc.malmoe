@@ -50,7 +50,7 @@ public class VirtualRepository implements IMalmoeRepository {
 
 				if (result instanceof NotFoundRetrievalResult) {
 					if (resolver != null) {
-						return resolver.serveRequest(request);
+						return resolveRemote(request);
 					}
 				}
 
@@ -60,7 +60,12 @@ public class VirtualRepository implements IMalmoeRepository {
 		}, IMalmoeRepository.ACCESS_REPOSITORY_READ);
 	}
 
-	private IRetrievalResult resolveLocal(IRetrievalRequest request) throws MalmoeException {
+	protected IRetrievalResult resolveRemote(IRetrievalRequest request) throws MalmoeException {
+
+		return resolver.serveRequest(request);
+	}
+
+	protected IRetrievalResult resolveLocal(IRetrievalRequest request) throws MalmoeException {
 
 		File groupLocation = new File(resolverLocation, request.getIdentifier().getComponentName().toString().replace(".", File.separator));
 		File moduleNameLocation = new File(groupLocation, request.getIdentifier().getModuleName().toString());
