@@ -37,6 +37,11 @@
 			</access>
 			<resolver name="maven" url="http://central.maven.org/maven2/" />
 		</virtualRepository>
+		<virtualRepository name="onlyLocal">
+			<access>
+				<group ref="testGroup" />
+			</access>
+		</virtualRepository>
 	</repositories>
 
 </repository>

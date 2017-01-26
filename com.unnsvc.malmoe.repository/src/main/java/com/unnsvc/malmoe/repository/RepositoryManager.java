@@ -57,7 +57,7 @@ public class RepositoryManager implements IRepositoryManager {
 
 					VirtualRepositoryConfig virtualConfig = (VirtualRepositoryConfig) config;
 					IRemoteResolver resolver = getResolver(resolverLocation, virtualConfig.getResolverConfig());
-					return new VirtualRepository(virtualConfig, identityManager, resolver);
+					return new VirtualRepository(virtualConfig, resolverLocation, identityManager, resolver);
 				}
 			}
 		}

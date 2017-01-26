@@ -48,7 +48,10 @@ public class VirtualRepositoryConfig implements IRepositoryConfig {
 
 		visitor.startVisitable(this);
 		accessConfig.visit(visitor.newVisitor());
-		resolverConfig.visit(visitor.newVisitor());
+		if(resolverConfig != null) {
+			// can have no resolver
+			resolverConfig.visit(visitor.newVisitor());
+		}
 		visitor.endVisitable(this);
 	}
 
