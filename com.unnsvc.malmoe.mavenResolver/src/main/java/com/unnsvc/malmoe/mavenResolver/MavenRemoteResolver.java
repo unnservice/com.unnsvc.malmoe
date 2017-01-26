@@ -5,20 +5,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.repository.RemoteRepository;
 
 import com.unnsvc.malmoe.common.IRetrievalRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.config.IResolverConfig;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalRequest;
+import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
+import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
+import com.unnsvc.malmoe.resolver.ERequestType;
 import com.unnsvc.malmoe.resolver.IRemoteResolver;
 import com.unnsvc.rhena.common.RhenaConstants;
-import com.unnsvc.rhena.common.execution.EExecutionType;
+import com.unnsvc.rhena.common.Utils;
 import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
 public class MavenRemoteResolver implements IRemoteResolver {
@@ -40,40 +45,96 @@ public class MavenRemoteResolver implements IRemoteResolver {
 	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException {
 
 		File groupLocation = new File(resolverLocation, request.getIdentifier().getComponentName().toString().replace(".", File.separator));
-		File moduleLocation = new File(groupLocation, request.getIdentifier().getModuleName().toString());
-		File versionLocation = new File(moduleLocation, request.getIdentifier().getVersion().toString());
-		if (!versionLocation.isDirectory()) {
-			versionLocation.mkdirs();
+		File moduleNameLocation = new File(groupLocation, request.getIdentifier().getModuleName().toString());
+		File moduleLocation = new File(moduleNameLocation, request.getIdentifier().getVersion().toString());
+		if (!moduleLocation.isDirectory()) {
+			moduleLocation.mkdirs();
 		}
 
 		try {
-
-			StringBuilder sb = new StringBuilder();
-			sb.append(request.getIdentifier().getComponentName().toString()).append(":");
-			sb.append(request.getIdentifier().getModuleName().toString()).append(":");
-			sb.append("jar").append(":");
-			sb.append(request.getIdentifier().getVersion().toString());
-
-			MavenDependencyCollector coll = new MavenDependencyCollector(getLocalRepoPath());
-			RemoteRepository repo = new RemoteRepository(resolverConfig.getUrl().hashCode() + "", "default", resolverConfig.getUrl().toString());
-			DependencyNode node = coll.collectDependencies(sb.toString(), repo);
-
-			if (node.getChildren().isEmpty() || node.getChildren().size() != 1) {
-				throw new MalmoeException("Resolved to (" + node.getChildren().size() + "): " + request);
+			File modelFile = new File(moduleLocation, RhenaConstants.MODULE_DESCRIPTOR_FILENAME);
+			if (!modelFile.exists()) {
+				adaptMavenArtifact(request, modelFile, moduleLocation);
 			}
 
-			if (request.getType().equals(EExecutionType.MODEL)) {
+			if (request.getType().equals(ERequestType.MODEL)) {
 
-				File modelFile = produceModel(request.getIdentifier(), node.getChildren().get(0), versionLocation);
 				return new ModelRetrievalResult(modelFile);
+			} else if (request.getType().equals(ERequestType.EXECUTIONS)) {
+
+				File executionsFile = new File(moduleLocation, RhenaConstants.EXECUTION_DESCRIPTOR_FILENAME);
+				return new ExecutionsRetrievalResult(executionsFile);
+			} else if (request.getType().equals(ERequestType.ARTIFACT)) {
+
+				ArtifactRetrievalRequest artifactRequest = (ArtifactRetrievalRequest) request;
+				File executionTypeLocation = new File(moduleLocation, artifactRequest.getExecutionType().literal());
+				File artifactFile = new File(executionTypeLocation, artifactRequest.getArtifactName());
+				if (artifactFile.exists()) {
+					return new ArtifactRetrievalResult(artifactFile);
+				}
 			}
+
 		} catch (Exception ex) {
 			throw new MalmoeException("Exception while resolving " + request.getIdentifier().toString(), ex);
 		}
 
 		return new NotFoundRetrievalResult();
 	}
-	
+
+	private void adaptMavenArtifact(IRetrievalRequest request, File modelFile, File moduleLocation) throws Exception {
+
+		MavenDependencyCollector coll = new MavenDependencyCollector(getLocalRepoPath());
+		coll.addRepository(resolverConfig.getUrl());
+
+		String coordinates = identifierToCoordinates(request.getIdentifier(), "jar");
+
+		DependencyNode node = coll.collectDependencies(coordinates);
+		produceModelFromMavenCollection(modelFile, request.getIdentifier(), node.getChildren().get(0), moduleLocation);
+
+		DependencyNode artifactNode = coll.resolveDependencies(coordinates);
+		produceExecutionFromMavenCollection(moduleLocation, artifactNode.getChildren().get(0));
+	}
+
+	private void produceExecutionFromMavenCollection(File moduleLocation, DependencyNode artifactNode) throws IOException {
+
+		File executionTypeLocation = new File(moduleLocation, "main");
+		if (!executionTypeLocation.isDirectory()) {
+			executionTypeLocation.mkdirs();
+		}
+
+		Artifact artifact = artifactNode.getDependency().getArtifact();
+
+		File executionFile = new File(executionTypeLocation, RhenaConstants.EXECUTION_DESCRIPTOR_FILENAME);
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(executionFile))) {
+			writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+			writer.write("<execution xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:execution\">");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+
+			writer.write("\t<meta date=\"" + new Date(System.currentTimeMillis()).toString() + "\" />");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+
+			writer.write("\t<artifact name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+
+			writer.write("</execution>");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+		}
+
+		File artifactLocation =  new File(executionTypeLocation, artifact.getFile().getName());
+		FileUtils.copyFile(artifact.getFile(), artifactLocation);
+	}
+
+	private String identifierToCoordinates(ModuleIdentifier identifier, String artifactType) {
+
+		StringBuilder coordinates = new StringBuilder();
+		coordinates.append(identifier.getComponentName().toString()).append(":");
+		coordinates.append(identifier.getModuleName().toString()).append(":");
+		coordinates.append(artifactType).append(":");
+		coordinates.append(identifier.getVersion().toString());
+		return coordinates.toString();
+	}
+
 	private File getLocalRepoPath() {
 
 		String m2Repo = System.getProperty("malmoe.resolver.maven.home");
@@ -91,9 +152,8 @@ public class MavenRemoteResolver implements IRemoteResolver {
 	 * @param dependenciesGraph
 	 * @throws IOException
 	 */
-	private File produceModel(ModuleIdentifier identifier, DependencyNode node, File versionLocation) throws IOException {
+	private void produceModelFromMavenCollection(File modelFile, ModuleIdentifier identifier, DependencyNode node, File versionLocation) throws IOException {
 
-		File modelFile = new File(versionLocation, RhenaConstants.MODULE_DESCRIPTOR_FILENAME);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {
 
 			writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
@@ -115,7 +175,6 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			writer.write("</module>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 		}
-		return modelFile;
 	}
 
 	private String toNotation(ModuleIdentifier identifier) {
