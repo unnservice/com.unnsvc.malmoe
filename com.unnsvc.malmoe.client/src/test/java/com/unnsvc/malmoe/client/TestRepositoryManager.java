@@ -15,7 +15,7 @@ import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
 import com.unnsvc.malmoe.repository.retrieval.RetrievalRequest;
-import com.unnsvc.rhena.common.execution.EExecutionType;
+import com.unnsvc.malmoe.resolver.ERequestType;
 import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
 public class TestRepositoryManager {
@@ -30,7 +30,8 @@ public class TestRepositoryManager {
 		IIdentityManager identityManager = new IdentityManager(config.getIdentityConfig());
 		IUser user = identityManager.authenticate("admin", "password");
 
-		RetrievalRequest request = new RetrievalRequest(user, "main", ModuleIdentifier.valueOf("com.test:something:0.0.1"), EExecutionType.MAIN);
+		ModuleIdentifier identifier = ModuleIdentifier.valueOf("com.test:something:0.0.1");
+		RetrievalRequest request = new RetrievalRequest(user, "main", identifier, ERequestType.MODEL);
 
 		IRepositoryManager manager = new RepositoryManager(workspaceDirectory, identityManager, config.getRepositoriesConfig());
 		IRetrievalResult result = manager.serveRequest(request);

@@ -45,7 +45,7 @@ public class ProxyRepository implements IMalmoeRepository {
 					}
 				}
 
-				return new NotFoundRetrievalResult();
+				return new NotFoundRetrievalResult(request);
 			}
 		}, IMalmoeRepository.ACCESS_REPOSITORY_READ);
 	}

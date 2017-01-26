@@ -64,7 +64,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 
 				File executionsFile = new File(moduleLocation, RhenaConstants.EXECUTION_DESCRIPTOR_FILENAME);
 				return new ExecutionsRetrievalResult(executionsFile);
-			} else if (request.getType().equals(ERequestType.ARTIFACT)) {
+			} else if (request instanceof ArtifactRetrievalRequest) {
 
 				ArtifactRetrievalRequest artifactRequest = (ArtifactRetrievalRequest) request;
 				File executionTypeLocation = new File(moduleLocation, artifactRequest.getExecutionType().literal());
@@ -78,7 +78,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			throw new MalmoeException("Exception while resolving " + request.getIdentifier().toString(), ex);
 		}
 
-		return new NotFoundRetrievalResult();
+		return new NotFoundRetrievalResult(request);
 	}
 
 	private void adaptMavenArtifact(IRetrievalRequest request, File modelFile, File moduleLocation) throws Exception {
