@@ -23,14 +23,9 @@ import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalRequest;
 import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalRequest;
 import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.RetrievalRequest;
-import com.unnsvc.malmoe.resolver.ERequestType;
-import com.unnsvc.rhena.common.RhenaConstants;
 
 public class RepositoryServlet extends HttpServlet {
 
@@ -64,19 +59,18 @@ public class RepositoryServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		String requestPath = req.getRequestURI();
-		String relativePath = requestPath.substring("/repository".length());
-		/**
-		 * Now pattern matching so we can extract relevant information
-		 */
-		RequestResolver requestResolver = new RequestResolver();
-		IResolvedRequest resolvedRequest = requestResolver.resolveRequest(relativePath);
+		if (requestPath.startsWith(MalmoeConstants.BASE_REPOSITORY_URI)) {
+			String relativePath = requestPath.substring(MalmoeConstants.BASE_REPOSITORY_URI.length());
 
-		if (resolvedRequest == null) {
 
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-		} else {
 
 			try {
+				/**
+				 * Now pattern matching so we can extract relevant information
+				 */
+				RequestResolver requestResolver = new RequestResolver(repositoryManager.getRepositoryNames());
+				IResolvedRequest resolvedRequest = requestResolver.resolveRequest(relativePath);
+				
 				/**
 				 * Now authentication before sending the request into the
 				 * repository manager
@@ -87,19 +81,6 @@ public class RepositoryServlet extends HttpServlet {
 				 * Now respond with appropriate HTTP response from repository
 				 * manager response
 				 */
-				if (resolvedRequest instanceof ModelResolvedRequest) {
-
-					ModelResolvedRequest m = (ModelResolvedRequest) resolvedRequest;
-					request = new RetrievalRequest(user, m.getRepositoryId(), m.getIdentifier(), ERequestType.MODEL);
-				} else if (resolvedRequest instanceof ArtifactResolvedRequest) {
-
-					ArtifactResolvedRequest a = (ArtifactResolvedRequest) resolvedRequest;
-					if (a.getArtifactName().equals(RhenaConstants.EXECUTION_DESCRIPTOR_FILENAME)) {
-						request = new ExecutionsRetrievalRequest(user, a.getRepositoryId(), a.getIdentifier(), a.getExecutionType());
-					} else {
-						request = new ArtifactRetrievalRequest(user, a.getRepositoryId(), a.getIdentifier(), a.getExecutionType(), a.getArtifactName());
-					}
-				}
 
 				IRetrievalResult result = repositoryManager.serveRequest(request);
 
@@ -110,7 +91,7 @@ public class RepositoryServlet extends HttpServlet {
 
 					throw new UnsupportedOperationException("Not implemented");
 				} else if (result instanceof ArtifactRetrievalResult) {
-					
+
 					throw new UnsupportedOperationException("Not implemented");
 				}
 

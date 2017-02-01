@@ -2,6 +2,8 @@
 package com.unnsvc.malmoe.repository;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import com.unnsvc.malmoe.common.IIdentityManager;
@@ -72,5 +74,16 @@ public class RepositoryManager implements IRepositoryManager {
 			}
 		}
 		throw new MalmoeException("No such resolver: " + resolverConfig.getResolverName());
+	}
+
+	@Override
+	public List<String> getRepositoryNames() {
+
+		List<String> repositoryNames = new ArrayList<String>();
+		for (IRepositoryConfig config : repositoriesConfig) {
+			
+			repositoryNames.add(config.getRepositoryName());
+		}
+		return repositoryNames;
 	}
 }

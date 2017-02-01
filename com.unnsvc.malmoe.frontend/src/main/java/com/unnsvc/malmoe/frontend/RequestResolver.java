@@ -1,60 +1,64 @@
 
 package com.unnsvc.malmoe.frontend;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
-import com.unnsvc.rhena.common.exceptions.RhenaException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.frontend.resolved.GenericRepositoryResolvedRequest;
+import com.unnsvc.rhena.common.RhenaConstants;
 import com.unnsvc.rhena.common.execution.EExecutionType;
-import com.unnsvc.rhena.common.identity.Identifier;
-import com.unnsvc.rhena.common.identity.ModuleIdentifier;
-import com.unnsvc.rhena.common.identity.Version;
 
 public class RequestResolver {
 
-	public static final Pattern MODEL_PATTERN = Pattern.compile("/(?<repositoryId>\\w+)/(?<moduleIdentifier>.*)/model\\.xml");
-	public static final Pattern ARTIFACT_PATTERN = Pattern.compile("/(?<repositoryId>\\w+)/(?<moduleIdentifier>.*)/(?<executionType>(main|test))/(?<artifactName>.*)");
+	private Logger log = LoggerFactory.getLogger(getClass());
+	private List<String> repositoryNames;
 
-	public IResolvedRequest resolveRequest(String relativePath) {
+	public RequestResolver(List<String> repositoryNames) throws MalmoeException {
 
-		try {
-			Matcher modelMatcher = MODEL_PATTERN.matcher(relativePath);
-			if (modelMatcher.find()) {
-				String repositoryId = modelMatcher.group("repositoryId");
-				ModuleIdentifier identifier = toModuleIdentifier(modelMatcher.group("moduleIdentifier"));
-				return new ModelResolvedRequest(repositoryId, identifier);
-			}
-
-			Matcher artifactMatcher = ARTIFACT_PATTERN.matcher(relativePath);
-			if (artifactMatcher.find()) {
-				String repositoryId = modelMatcher.group("repositoryId");
-				ModuleIdentifier identifier = toModuleIdentifier(modelMatcher.group("moduleIdentifier"));
-				EExecutionType execType = EExecutionType.valueOf(artifactMatcher.group("executionType"));
-				return new ArtifactResolvedRequest(repositoryId, identifier, execType, artifactMatcher.group("artifactName"));
-			}
-		} catch (RhenaException re) {
-			
-			re.printStackTrace();
-			return null;
+		if (repositoryNames.isEmpty()) {
+			throw new MalmoeException("No repositories");
 		}
 
-		return null;
+		this.repositoryNames = repositoryNames;
 	}
 
-	private ModuleIdentifier toModuleIdentifier(String identifierString) throws RhenaException {
+	public IResolvedRequest resolveRequest(String repoRelativePath) throws MalmoeException {
 
-		String[] parts = identifierString.split("/");
-		// need at least component-module-version
-		if (parts.length < 3) {
-			return null;
+		String repositoryName = getRepositoryName(repoRelativePath);
+		repoRelativePath = repoRelativePath.substring(repoRelativePath.indexOf(repositoryName) + repositoryName.length());
+
+		System.err.println("in string: " + repoRelativePath);
+		System.err.println("repositoryName is: " + repositoryName);
+
+//		if (repoRelativePath.endsWith("/")) {
+//
+//			return new GenericRepositoryResolvedRequest(repositoryName, repoRelativePath);
+//		} else {
+//
+//			String artifact = parts[parts.length - 1];
+//			if (artifact.equals(RhenaConstants.MODULE_DESCRIPTOR_FILENAME)) {
+//
+//				repoRelativePath = repoRelativePath.substring(repoRelativePath.lastIndexOf(RhenaConstants.MODULE_DESCRIPTOR_FILENAME));
+//				System.err.println("Model and: " + repoRelativePath);
+//			} else if (parts[parts.length - 2].matches("^(main|test)$")) {
+//
+//				EExecutionType type = EExecutionType.valueOf(parts[parts.length - 2].toUpperCase());
+//				System.err.println("Execution type: " + parts[parts.length - 2] + " artifact " + artifact);
+//			}
+//		}
+
+		throw new UnsupportedOperationException("invalid repository path");
+	}
+
+	private String getRepositoryName(String repoRelativePath) throws MalmoeException {
+
+		String[] parts = repoRelativePath.split("/");
+		if (!repositoryNames.contains(parts[1])) {
+			throw new MalmoeException("Invalid repository name: " + parts[1]);
 		}
-
-		Version version = Version.valueOf(parts[parts.length]);
-		Identifier module = Identifier.valueOf(parts[parts.length - 1]);
-
-		String componentStr = identifierString.substring(0, identifierString.lastIndexOf("/" + module + "/" + version + "/"));
-		Identifier component = Identifier.valueOf(componentStr.replace("/", "."));
-
-		return new ModuleIdentifier(component, module, version);
+		return parts[1];
 	}
 }

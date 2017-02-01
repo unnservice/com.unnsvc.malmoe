@@ -1,43 +1,36 @@
 
 package com.unnsvc.malmoe.frontend;
 
-import java.util.regex.Matcher;
+import java.util.Collections;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+
+/**
+ * /<repoName>/<com/ponent/Name>/<moduleName>/<version>/ /model.xml
+ * /main/executions.xml /test/executions.xml
+ * 
+ * /<repositoryId>?component=<componentName>&module=<moduleName>&version=<versionName>&executionType=<executionType>&artifactName=
+ * 
+ * @author noname
+ *
+ */
 public class TestRequestPatterns {
 
-	@Test
-	public void testModelPattern() throws Exception {
+	private RequestResolver resolver;
 
-		String modelRequest = "/model.xml";
-		Assert.assertTrue(RequestResolver.MODEL_PATTERN.matcher(modelRequest).matches());
+	@Before
+	public void before() throws MalmoeException {
+
+		resolver = new RequestResolver(Collections.singletonList("repo1"));
 	}
 
 	@Test
-	public void testExecutionsPattern() throws Exception {
+	public void testModel() throws Exception {
 
-		String executionMainRequest = "/main/executions.xml";
-		Matcher matched = RequestResolver.ARTIFACT_PATTERN.matcher(executionMainRequest);
-		Assert.assertTrue(matched.find());
-		Assert.assertEquals("main", matched.group("executionType"));
-		Assert.assertEquals("executions.xml", matched.group("artifactName"));
-
-		String executionTestRequest = "/test/executions.xml";
-		Assert.assertTrue(RequestResolver.ARTIFACT_PATTERN.matcher(executionTestRequest).matches());
-
-		String executionUnknownRequest = "/unknown/executions.xml";
-		Assert.assertFalse(RequestResolver.ARTIFACT_PATTERN.matcher(executionUnknownRequest).matches());
-	}
-
-	@Test
-	public void testArtifactResult() throws Exception {
-		
-		String artifactRequest = "/main/someartifact-0.0.1.jar";
-		Matcher matched = RequestResolver.ARTIFACT_PATTERN.matcher(artifactRequest);
-		Assert.assertTrue(matched.find());
-		Assert.assertEquals("main", matched.group("executionType"));
-		Assert.assertEquals("someartifact-0.0.1.jar", matched.group("artifactName"));
+		String modelRequest = "/repo1/com/component/com.component.artifact/0.0.1/model.xml";
+		resolver.resolveRequest(modelRequest);
 	}
 }

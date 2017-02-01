@@ -7,7 +7,7 @@
 		</layout>
 	</appender>
 
-	<logger name="com.unnsvc.malmoe" level="DEBUG" />
+	<logger name="com.unnsvc.malmoe" level="TRACE" />
 
 
 	<root level="INFO">
