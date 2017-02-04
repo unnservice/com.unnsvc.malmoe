@@ -7,9 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
-import com.unnsvc.malmoe.frontend.resolved.GenericRepositoryResolvedRequest;
-import com.unnsvc.rhena.common.RhenaConstants;
-import com.unnsvc.rhena.common.execution.EExecutionType;
 
 public class RequestResolver {
 
