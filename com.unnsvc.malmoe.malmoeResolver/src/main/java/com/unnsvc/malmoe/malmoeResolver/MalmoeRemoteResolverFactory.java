@@ -4,8 +4,8 @@ package com.unnsvc.malmoe.malmoeResolver;
 import java.io.File;
 
 import com.unnsvc.malmoe.common.config.IResolverConfig;
-import com.unnsvc.malmoe.resolver.IRemoteResolver;
-import com.unnsvc.malmoe.resolver.IRemoteResolverFactory;
+import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
+import com.unnsvc.malmoe.common.resolver.IRemoteResolverFactory;
 
 public class MalmoeRemoteResolverFactory implements IRemoteResolverFactory {
 

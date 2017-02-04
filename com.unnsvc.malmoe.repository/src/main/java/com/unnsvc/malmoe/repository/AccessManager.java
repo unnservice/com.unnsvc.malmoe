@@ -8,7 +8,7 @@ import java.util.List;
 import com.unnsvc.malmoe.common.IAccess;
 import com.unnsvc.malmoe.common.IAccessManager;
 import com.unnsvc.malmoe.common.IIdentityManager;
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.IUser;
 import com.unnsvc.malmoe.common.config.IAccessConfig;
@@ -36,7 +36,7 @@ public class AccessManager implements IAccessManager {
 	}
 
 	@Override
-	public IRetrievalResult withPermissions(IRetrievalRequest request, IAccess<IRetrievalResult> iAccess, String... permissions) throws MalmoeException {
+	public IRetrievalResult withPermissions(IResolvedRequest request, IAccess<IRetrievalResult> iAccess, String... permissions) throws MalmoeException {
 
 		if (hasPermissions(request.getUser(), permissions)) {
 

@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.repository.identity.AnonymousUser;
+import com.unnsvc.malmoe.repository.requests.RequestResolver;
 
 /**
  * /<repoName>/<com/ponent/Name>/<moduleName>/<version>/ /model.xml
@@ -24,7 +26,7 @@ public class TestRequestPatterns {
 	@Before
 	public void before() throws MalmoeException {
 
-		resolver = new RequestResolver(Collections.singletonList("repo1"));
+		resolver = new RequestResolver(Collections.singletonList("repo1"), new AnonymousUser());
 	}
 
 	@Test

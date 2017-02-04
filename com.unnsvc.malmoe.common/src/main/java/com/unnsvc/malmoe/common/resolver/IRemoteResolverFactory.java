@@ -1,5 +1,5 @@
 
-package com.unnsvc.malmoe.resolver;
+package com.unnsvc.malmoe.common.resolver;
 
 import java.io.File;
 

@@ -11,12 +11,12 @@ import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
 import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.GenericRepositoryResolvedRequest;
 import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
 import com.unnsvc.malmoe.repository.requests.RequestResolver;
+import com.unnsvc.rhena.common.RhenaConstants;
 import com.unnsvc.rhena.common.exceptions.RhenaException;
 
-public class TestRequestResolver {
+public class TestResolvUri {
 
 	private RequestResolver resolver;
 	private IResolvedRequest resolved;
@@ -30,23 +30,14 @@ public class TestRequestResolver {
 	@Test
 	public void testModel() throws RhenaException, MalmoeException {
 
-		resolved = resolver.resolveRequest("/repo1/com/test/artifact/0.0.1/model.xml");
+		resolved = resolver.resolveRequest("/repo1/com/test/com.test.artifact/0.0.1/" + RhenaConstants.MODULE_DESCRIPTOR_FILENAME);
 		Assert.assertTrue(resolved instanceof ModelRepositoryResolvedRequest);
 	}
 	
 	@Test
 	public void testArtifact() throws RhenaException, MalmoeException {
-		
-		resolved = resolver.resolveRequest("/repo1/com/test/artifact/0.0.1/main/artifacts.xml");
+
+		resolved = resolver.resolveRequest("/repo1/com/test/com.test.artifact/0.0.1/test/artifact.jar");
 		Assert.assertTrue(resolved instanceof ArtifactRepositoryResolvedRequest);
-	}
-	
-	@Test
-	public void testOtherRepositoryRequest() throws RhenaException, MalmoeException {
-		
-		resolved = resolver.resolveRequest("/repo1/com/test/artifact");
-		ArtifactRepositoryResolvedRequest a = (ArtifactRepositoryResolvedRequest) resolved;
-		System.err.println("Resolved is " + resolved.getClass());
-		Assert.assertTrue(resolved instanceof GenericRepositoryResolvedRequest);
 	}
 }

@@ -13,20 +13,28 @@ import javax.servlet.http.HttpServletResponse;
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeConfiguration;
 import com.unnsvc.malmoe.common.IRepositoryManager;
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.IUser;
 import com.unnsvc.malmoe.common.MalmoeConstants;
 import com.unnsvc.malmoe.common.exceptions.AccessException;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
+import com.unnsvc.malmoe.repository.requests.RequestResolver;
 import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
 
+/**
+ * 
+ * @TODO sanitize request as we will be passing it into the filesystem
+ * @author noname
+ *
+ */
 public class RepositoryServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -62,27 +70,25 @@ public class RepositoryServlet extends HttpServlet {
 		if (requestPath.startsWith(MalmoeConstants.BASE_REPOSITORY_URI)) {
 			String relativePath = requestPath.substring(MalmoeConstants.BASE_REPOSITORY_URI.length());
 
-
-
 			try {
-				/**
-				 * Now pattern matching so we can extract relevant information
-				 */
-				RequestResolver requestResolver = new RequestResolver(repositoryManager.getRepositoryNames());
-				IResolvedRequest resolvedRequest = requestResolver.resolveRequest(relativePath);
-				
 				/**
 				 * Now authentication before sending the request into the
 				 * repository manager
 				 */
 				IUser user = requestToUser(req);
-				IRetrievalRequest request = null;
+
+				/**
+				 * Now pattern matching so we can extract relevant information
+				 */
+				RequestResolver requestResolver = new RequestResolver(repositoryManager.getRepositoryNames(), user);
+				IResolvedRequest resolvedRequest = requestResolver.resolveRequest(relativePath);
+
 				/**
 				 * Now respond with appropriate HTTP response from repository
 				 * manager response
 				 */
 
-				IRetrievalResult result = repositoryManager.serveRequest(request);
+				IRetrievalResult result = repositoryManager.serveRequest(resolvedRequest);
 
 				if (result instanceof ModelRetrievalResult) {
 
@@ -98,6 +104,9 @@ public class RepositoryServlet extends HttpServlet {
 			} catch (AccessException ae) {
 
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+			} catch (NotFoundMalmoeException nfe) {
+
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			} catch (MalmoeException me) {
 
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

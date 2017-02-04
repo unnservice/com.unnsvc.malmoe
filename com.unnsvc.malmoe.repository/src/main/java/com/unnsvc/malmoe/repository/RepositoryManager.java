@@ -9,16 +9,16 @@ import java.util.ServiceLoader;
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeRepository;
 import com.unnsvc.malmoe.common.IRepositoryManager;
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.config.IRepositoriesConfig;
 import com.unnsvc.malmoe.common.config.IRepositoryConfig;
 import com.unnsvc.malmoe.common.config.IResolverConfig;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
+import com.unnsvc.malmoe.common.resolver.IRemoteResolverFactory;
 import com.unnsvc.malmoe.repository.config.ProxyRepositoryConfig;
 import com.unnsvc.malmoe.repository.config.VirtualRepositoryConfig;
-import com.unnsvc.malmoe.resolver.IRemoteResolver;
-import com.unnsvc.malmoe.resolver.IRemoteResolverFactory;
 
 public class RepositoryManager implements IRepositoryManager {
 
@@ -36,9 +36,9 @@ public class RepositoryManager implements IRepositoryManager {
 	}
 
 	@Override
-	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException {
+	public IRetrievalResult serveRequest(IResolvedRequest request) throws MalmoeException {
 
-		IMalmoeRepository repo = getRepository(request.getRepositoryName());
+		IMalmoeRepository repo = getRepository(request.getRepositoryId());
 		return repo.serveRequest(request);
 	}
 

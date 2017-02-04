@@ -1,19 +1,19 @@
 
 package com.unnsvc.malmoe.repository.retrieval;
 
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 
 public class NotFoundRetrievalResult implements IRetrievalResult {
 
-	private IRetrievalRequest request;
+	private IResolvedRequest request;
 
-	public NotFoundRetrievalResult(IRetrievalRequest request) {
+	public NotFoundRetrievalResult(IResolvedRequest request) {
 
 		this.request = request;
 	}
 
-	public IRetrievalRequest getRequest() {
+	public IResolvedRequest getRequest() {
 
 		return request;
 	}

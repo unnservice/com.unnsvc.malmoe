@@ -1,24 +1,26 @@
 
-package com.unnsvc.malmoe.frontend.resolved;
+package com.unnsvc.malmoe.repository.requests;
 
+import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
+import com.unnsvc.malmoe.common.IUser;
 import com.unnsvc.rhena.common.execution.EExecutionType;
 import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
-public class ArtifactRepositoryResolvedRequest extends AbstractRepositoryResolvedRequest {
+public class ArtifactRepositoryResolvedRequest extends AbstractRepositoryResolvedRequest implements IResolvedArtifactRequest {
 
 	private ModuleIdentifier moduleIdentifier;
 	private EExecutionType executionType;
 	private String artifactName;
 
-	public ArtifactRepositoryResolvedRequest(String repositoryId, ModuleIdentifier moduleIdentifier, EExecutionType executionType, String artifactName) {
+	public ArtifactRepositoryResolvedRequest(IUser user, String repositoryId, ModuleIdentifier moduleIdentifier, EExecutionType executionType, String artifactName) {
 
-		super(repositoryId);
+		super(user, repositoryId);
 		this.moduleIdentifier = moduleIdentifier;
 		this.executionType = executionType;
 		this.artifactName = artifactName;
 	}
 
-	public ModuleIdentifier getModuleIdentifier() {
+	public ModuleIdentifier getIdentifier() {
 
 		return moduleIdentifier;
 	}

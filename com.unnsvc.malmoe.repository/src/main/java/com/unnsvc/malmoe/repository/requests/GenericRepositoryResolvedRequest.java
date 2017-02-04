@@ -1,13 +1,15 @@
 
-package com.unnsvc.malmoe.frontend.resolved;
+package com.unnsvc.malmoe.repository.requests;
+
+import com.unnsvc.malmoe.common.IUser;
 
 public class GenericRepositoryResolvedRequest extends AbstractRepositoryResolvedRequest {
 
 	private String repoRelativePath;
 
-	public GenericRepositoryResolvedRequest(String repositoryId, String repoRelativePath) {
+	public GenericRepositoryResolvedRequest(IUser user, String repositoryId, String repoRelativePath) {
 
-		super(repositoryId);
+		super(user, repositoryId);
 		this.repoRelativePath = repoRelativePath;
 	}
 

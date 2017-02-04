@@ -7,17 +7,19 @@ import com.unnsvc.malmoe.common.IAccess;
 import com.unnsvc.malmoe.common.IAccessManager;
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeRepository;
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
 import com.unnsvc.malmoe.repository.config.VirtualRepositoryConfig;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalRequest;
+import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
+import com.unnsvc.malmoe.repository.requests.GenericRepositoryResolvedRequest;
+import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
 import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalResult;
+import com.unnsvc.malmoe.repository.retrieval.FileRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
-import com.unnsvc.malmoe.resolver.ERequestType;
-import com.unnsvc.malmoe.resolver.IRemoteResolver;
 import com.unnsvc.rhena.common.RhenaConstants;
 
 /**
@@ -40,7 +42,18 @@ public class VirtualRepository implements IMalmoeRepository {
 	}
 
 	@Override
-	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException {
+	public IRetrievalResult serveRequest(IResolvedRequest request) throws MalmoeException {
+
+		if (request instanceof GenericRepositoryResolvedRequest) {
+
+			return serveListing((GenericRepositoryResolvedRequest) request);
+		} else {
+
+			return serveArtifact((IResolvedArtifactRequest) request);
+		}
+	}
+
+	private IRetrievalResult serveArtifact(IResolvedArtifactRequest request) throws MalmoeException {
 
 		return accessManager.withPermissions(request, new IAccess<IRetrievalResult>() {
 
@@ -60,12 +73,30 @@ public class VirtualRepository implements IMalmoeRepository {
 		}, IMalmoeRepository.ACCESS_REPOSITORY_READ);
 	}
 
-	protected IRetrievalResult resolveRemote(IRetrievalRequest request) throws MalmoeException {
+	private IRetrievalResult serveListing(GenericRepositoryResolvedRequest request) throws MalmoeException {
+
+		return accessManager.withPermissions(request, new IAccess<IRetrievalResult>() {
+
+			@Override
+			public IRetrievalResult execute() throws MalmoeException {
+
+				File location = new File(resolverLocation, request.getRepoRelativePath().replace(".", File.separator));
+				if(location.exists() && location.isDirectory()) {
+					
+					return new FileRetrievalResult(location);
+				}
+				
+				return new NotFoundRetrievalResult(request);
+			}
+		}, IMalmoeRepository.ACCESS_REPOSITORY_READ, IMalmoeRepository.ACCESS_REPOSITORY_LIST);
+	}
+
+	protected IRetrievalResult resolveRemote(IResolvedArtifactRequest request) throws MalmoeException {
 
 		return resolver.serveRequest(request);
 	}
 
-	protected IRetrievalResult resolveLocal(IRetrievalRequest request) throws MalmoeException {
+	protected IRetrievalResult resolveLocal(IResolvedArtifactRequest request) throws MalmoeException {
 
 		File groupLocation = new File(resolverLocation, request.getIdentifier().getComponentName().toString().replace(".", File.separator));
 		File moduleNameLocation = new File(groupLocation, request.getIdentifier().getModuleName().toString());
@@ -77,21 +108,15 @@ public class VirtualRepository implements IMalmoeRepository {
 
 		try {
 
-			if (request.getType().equals(ERequestType.MODEL)) {
+			if (request instanceof ModelRepositoryResolvedRequest) {
 
 				File modelFile = new File(moduleLocation, RhenaConstants.MODULE_DESCRIPTOR_FILENAME);
 				if (modelFile.exists()) {
 					return new ModelRetrievalResult(modelFile);
 				}
-			} else if (request.getType().equals(ERequestType.EXECUTIONS)) {
+			} else if (request instanceof ArtifactRepositoryResolvedRequest) {
 
-				File executionsFile = new File(moduleLocation, RhenaConstants.EXECUTION_DESCRIPTOR_FILENAME);
-				if (executionsFile.exists()) {
-					return new ExecutionsRetrievalResult(executionsFile);
-				}
-			} else if (request instanceof ArtifactRetrievalRequest) {
-
-				ArtifactRetrievalRequest artifactRequest = (ArtifactRetrievalRequest) request;
+				ArtifactRepositoryResolvedRequest artifactRequest = (ArtifactRepositoryResolvedRequest) request;
 				File executionTypeLocation = new File(moduleLocation, artifactRequest.getExecutionType().literal());
 				File artifactFile = new File(executionTypeLocation, artifactRequest.getArtifactName());
 				if (artifactFile.exists()) {

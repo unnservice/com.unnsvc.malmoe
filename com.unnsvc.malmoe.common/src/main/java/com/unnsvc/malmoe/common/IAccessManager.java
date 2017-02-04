@@ -5,6 +5,6 @@ import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 
 public interface IAccessManager {
 
-	public IRetrievalResult withPermissions(IRetrievalRequest request, IAccess<IRetrievalResult> iAccess, String... permission) throws MalmoeException;
+	public IRetrievalResult withPermissions(IResolvedRequest request, IAccess<IRetrievalResult> iAccess, String... permission) throws MalmoeException;
 
 }

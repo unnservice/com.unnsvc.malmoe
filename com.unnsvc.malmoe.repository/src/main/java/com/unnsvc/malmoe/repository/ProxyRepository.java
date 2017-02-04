@@ -6,7 +6,7 @@ import com.unnsvc.malmoe.common.IAccessManager;
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeRepository;
 import com.unnsvc.malmoe.common.IRepositoryManager;
-import com.unnsvc.malmoe.common.IRetrievalRequest;
+import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
@@ -28,7 +28,7 @@ public class ProxyRepository implements IMalmoeRepository {
 	}
 
 	@Override
-	public IRetrievalResult serveRequest(IRetrievalRequest request) throws MalmoeException {
+	public IRetrievalResult serveRequest(IResolvedRequest request) throws MalmoeException {
 
 		return accessManager.withPermissions(request, new IAccess<IRetrievalResult>() {
 
@@ -49,5 +49,4 @@ public class ProxyRepository implements IMalmoeRepository {
 			}
 		}, IMalmoeRepository.ACCESS_REPOSITORY_READ);
 	}
-
 }
