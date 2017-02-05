@@ -40,7 +40,6 @@ public class ArtifactRepositoryResolvedRequest extends AbstractRepositoryResolve
 	public String toString() {
 
 		return "ArtifactRepositoryResolvedRequest [moduleIdentifier=" + moduleIdentifier + ", executionType=" + executionType + ", artifactName=" + artifactName
-				+ "]";
+				+ ", toString()=" + super.toString() + "]";
 	}
-
 }

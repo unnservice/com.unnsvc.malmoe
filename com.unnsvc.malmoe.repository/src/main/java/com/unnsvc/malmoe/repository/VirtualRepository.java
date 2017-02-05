@@ -31,15 +31,20 @@ import com.unnsvc.rhena.common.RhenaConstants;
 public class VirtualRepository implements IMalmoeRepository {
 
 	// private Logger log = LoggerFactory.getLogger(getClass());
-	private File resolverLocation;
+	private File repositoryLocation;
 	private IAccessManager accessManager;
 	private IRemoteResolver resolver;
 
-	public VirtualRepository(VirtualRepositoryConfig virtualConfig, File resolverLocation, IIdentityManager identityManager, IRemoteResolver resolver) {
+	public VirtualRepository(VirtualRepositoryConfig virtualConfig, File repositoryLocation, IIdentityManager identityManager, IRemoteResolver resolver) {
 
-		this.resolverLocation = resolverLocation;
+		this.repositoryLocation = repositoryLocation;
 		this.accessManager = new AccessManager(virtualConfig.getAccessConfig(), identityManager);
 		this.resolver = resolver;
+	}
+	
+	public VirtualRepository(VirtualRepositoryConfig virtualConfig, File repositoryLocation, IIdentityManager identityManager) {
+
+		this(virtualConfig, repositoryLocation, identityManager, null);
 	}
 
 	@Override
@@ -81,7 +86,7 @@ public class VirtualRepository implements IMalmoeRepository {
 			@Override
 			public IRetrievalResult execute() throws MalmoeException {
 
-				File location = new File(resolverLocation, request.getRepoRelativePath().replace(".", File.separator));
+				File location = new File(repositoryLocation, request.getRepoRelativePath().replace(".", File.separator));
 				if (location.exists() && location.isDirectory()) {
 
 					return new FileRetrievalResult(location);
@@ -99,7 +104,7 @@ public class VirtualRepository implements IMalmoeRepository {
 
 	protected IRetrievalResult resolveLocal(IResolvedArtifactRequest request) throws MalmoeException {
 
-		File groupLocation = new File(resolverLocation, request.getIdentifier().getComponentName().toString().replace(".", File.separator));
+		File groupLocation = new File(repositoryLocation, request.getIdentifier().getComponentName().toString().replace(".", File.separator));
 		File moduleNameLocation = new File(groupLocation, request.getIdentifier().getModuleName().toString());
 		File moduleLocation = new File(moduleNameLocation, request.getIdentifier().getVersion().toString());
 

@@ -9,4 +9,10 @@ public class ModelRetrievalResult extends FileRetrievalResult {
 
 		super(retrievalResult);
 	}
+
+	@Override
+	public String toString() {
+
+		return "ModelRetrievalResult [toString()=" + super.toString() + "]";
+	}
 }

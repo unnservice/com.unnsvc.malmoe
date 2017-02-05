@@ -20,6 +20,6 @@ public class FileRetrievalResult extends ServedRetrievalResult {
 	@Override
 	public String toString() {
 
-		return "FileRetrievalResult [resultingFile=" + resultingFile + "]";
+		return "FileRetrievalResult [resultingFile=" + resultingFile + ", toString()=" + super.toString() + "]";
 	}
 }

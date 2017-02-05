@@ -19,4 +19,10 @@ public class ModelRepositoryResolvedRequest extends AbstractRepositoryResolvedRe
 
 		return moduleIdentifier;
 	}
+
+	@Override
+	public String toString() {
+
+		return "ModelRepositoryResolvedRequest [moduleIdentifier=" + moduleIdentifier + ", toString()=" + super.toString() + "]";
+	}
 }

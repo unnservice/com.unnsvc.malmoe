@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeRepository;
 import com.unnsvc.malmoe.common.IRepositoryManager;
@@ -15,6 +18,7 @@ import com.unnsvc.malmoe.common.config.IRepositoriesConfig;
 import com.unnsvc.malmoe.common.config.IRepositoryConfig;
 import com.unnsvc.malmoe.common.config.IResolverConfig;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
 import com.unnsvc.malmoe.common.resolver.IRemoteResolverFactory;
 import com.unnsvc.malmoe.repository.config.ProxyRepositoryConfig;
@@ -22,6 +26,7 @@ import com.unnsvc.malmoe.repository.config.VirtualRepositoryConfig;
 
 public class RepositoryManager implements IRepositoryManager {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
 	private File workspaceLocation;
 	private IIdentityManager identityManager;
 	private IRepositoriesConfig repositoriesConfig;
@@ -50,21 +55,26 @@ public class RepositoryManager implements IRepositoryManager {
 
 				if (config instanceof ProxyRepositoryConfig) {
 
+					log.debug("Serving using repository: " + repositoryName + " of type proxy");
+
 					ProxyRepositoryConfig proxyConfig = (ProxyRepositoryConfig) config;
 					return new ProxyRepository(proxyConfig, identityManager, this);
 				} else if (config instanceof VirtualRepositoryConfig) {
 
-					File storageLocation = new File(workspaceLocation, "storage");
-					File resolverLocation = new File(storageLocation, repositoryName);
-
 					VirtualRepositoryConfig virtualConfig = (VirtualRepositoryConfig) config;
-					IRemoteResolver resolver = getResolver(resolverLocation, virtualConfig.getResolverConfig());
-					return new VirtualRepository(virtualConfig, resolverLocation, identityManager, resolver);
+
+					File storageLocation = new File(workspaceLocation, "storage");
+					File repositoryLocation = new File(storageLocation, repositoryName);
+					IRemoteResolver resolver = getResolver(repositoryLocation, virtualConfig.getResolverConfig());
+
+					log.debug("Serving using repository: " + repositoryName + " of type virtual, location: " + repositoryLocation);
+
+					return new VirtualRepository(virtualConfig, repositoryLocation, identityManager, resolver);
 				}
 			}
 		}
-		
-		throw new MalmoeException("No such repository: " + repositoryName);
+
+		throw new NotFoundMalmoeException("No such repository: " + repositoryName);
 	}
 
 	private IRemoteResolver getResolver(File resolverLocation, IResolverConfig resolverConfig) throws MalmoeException {
@@ -82,7 +92,7 @@ public class RepositoryManager implements IRepositoryManager {
 
 		List<String> repositoryNames = new ArrayList<String>();
 		for (IRepositoryConfig config : repositoriesConfig) {
-			
+
 			repositoryNames.add(config.getRepositoryName());
 		}
 		return repositoryNames;

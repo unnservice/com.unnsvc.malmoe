@@ -38,11 +38,7 @@ public class RequestResolver {
 		String repositoryName = getRepositoryName(repoRelativePath);
 		repoRelativePath = repoRelativePath.substring(repoRelativePath.indexOf(repositoryName) + repositoryName.length());
 
-		System.err.println("in string: " + repoRelativePath);
-		System.err.println("repositoryName is: " + repositoryName);
-
 		int nrParts = repoRelativePath.split("/").length;
-		System.err.println("parts len " + nrParts);
 
 		IResolvedRequest resolved = null;
 		if (repoRelativePath.endsWith("/")) {
@@ -69,12 +65,10 @@ public class RequestResolver {
 
 		String artifactName = parts[parts.length - 1];
 		repoRelativePath = repoRelativePath.substring(0, repoRelativePath.lastIndexOf(artifactName) - 1);
-		System.err.println("Repo relative path: " + repoRelativePath + " artifact: " + artifactName);
 
 		String executionTypeStr = parts[parts.length - 2];
 		EExecutionType type = EExecutionType.valueOf(executionTypeStr.toUpperCase());
 		repoRelativePath = repoRelativePath.substring(0, repoRelativePath.lastIndexOf(executionTypeStr));
-		System.err.println("Repo relative path: " + repoRelativePath + " type: " + type);
 
 		ModuleIdentifier identifier = toModuleIdentifier(repoRelativePath);
 
@@ -84,7 +78,6 @@ public class RequestResolver {
 	private IResolvedRequest resolveModuleRequest(String repositoryName, String repoRelativePath) throws RhenaException {
 
 		repoRelativePath = repoRelativePath.substring(0, repoRelativePath.lastIndexOf(RhenaConstants.MODULE_DESCRIPTOR_FILENAME));
-		System.err.println("Path without module " + repoRelativePath);
 		// repoRelativePath starts and ends with /
 		ModuleIdentifier identifier = toModuleIdentifier(repoRelativePath);
 		return new ModelRepositoryResolvedRequest(user, repositoryName, identifier);
@@ -102,7 +95,6 @@ public class RequestResolver {
 		Identifier componentName = Identifier.valueOf(componentNamePathStr.replace("/", "."));
 
 		ModuleIdentifier moduleIdentifier = new ModuleIdentifier(componentName, moduleName, version);
-		System.err.println("Produced moduleIdentifier " + moduleIdentifier);
 		return moduleIdentifier;
 	}
 

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -29,13 +28,13 @@ import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 import com.unnsvc.malmoe.common.requests.RequestResolver;
 import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.common.retrieval.ExecutionsRetrievalResult;
 import com.unnsvc.malmoe.common.retrieval.FileRetrievalResult;
 import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
+import com.unnsvc.rhena.common.RhenaConstants;
 
 /**
  * 
@@ -67,6 +66,7 @@ public class RepositoryServlet extends HttpServlet {
 			malmoeConfig = new MalmoeConfigurationParser(malmoeHome);
 			identityManager = new IdentityManager(malmoeConfig.getIdentityConfig());
 			repositoryManager = new RepositoryManager(malmoeHome, identityManager, malmoeConfig.getRepositoriesConfig());
+			log.info("Configuring Malmoe with malmoe.home at " + malmoeHome);
 		} catch (MalmoeException e) {
 			log.error(e.getMessage(), e);
 			throw new ServletException(e.getMessage(), e);
@@ -76,15 +76,17 @@ public class RepositoryServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		String requestPath = req.getRequestURI();
-
+		String contextRelativePath = req.getRequestURI().substring(req.getServletContext().getContextPath().length());
+		log.debug("Request path " + contextRelativePath);
+		
 		// sanitise
-		if (requestPath.contains("..")) {
-			sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+		if (contextRelativePath.contains("..")) {
+			sendError(contextRelativePath, req, resp, HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
 
-		if (requestPath.startsWith(MalmoeConstants.BASE_REPOSITORY_URI)) {
-			String relativePath = requestPath.substring(MalmoeConstants.BASE_REPOSITORY_URI.length());
+		if (contextRelativePath.startsWith(MalmoeConstants.BASE_REPOSITORY_URI)) {
+			String relativePath = contextRelativePath.substring(MalmoeConstants.BASE_REPOSITORY_URI.length());
 
 			try {
 				/**
@@ -98,6 +100,7 @@ public class RepositoryServlet extends HttpServlet {
 				 */
 				RequestResolver requestResolver = new RequestResolver(repositoryManager.getRepositoryNames(), user);
 				IResolvedRequest resolvedRequest = requestResolver.resolveRequest(relativePath);
+				log.debug("Request resolved to " + resolvedRequest);
 
 				/**
 				 * Now respond with appropriate HTTP response from repository
@@ -110,29 +113,33 @@ public class RepositoryServlet extends HttpServlet {
 
 					resp.setContentType("application/xml");
 					serveContent(resp, (ModelRetrievalResult) result);
-				} else if (result instanceof ExecutionsRetrievalResult) {
-
-					resp.setContentType("application/xml");
-					serveContent(resp, (ModelRetrievalResult) result);
 				} else if (result instanceof ArtifactRetrievalResult) {
 
-					resp.setContentType("application/octet-stream");
-					serveContent(resp, (ArtifactRetrievalResult) result);
+					FileRetrievalResult fileResult = (FileRetrievalResult) result;
+					if (fileResult.getFile().getName().equals(RhenaConstants.ARTIFACTS_DESCRIPTOR_FILENAME)) {
+						resp.setContentType("application/xml");
+					} else {
+						resp.setContentType("application/octet-stream");
+					}
+					serveContent(resp, fileResult);
 				}
 
 			} catch (AccessException ae) {
 
-				sendError(requestPath, resp, HttpServletResponse.SC_FORBIDDEN);
+				log.debug(ae.getMessage(), ae);
+				sendError(contextRelativePath, req, resp, HttpServletResponse.SC_FORBIDDEN);
 			} catch (NotFoundMalmoeException nfe) {
 
-				sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+				log.debug(nfe.getMessage(), nfe);
+				sendError(contextRelativePath, req, resp, HttpServletResponse.SC_NOT_FOUND);
 			} catch (MalmoeException me) {
 
-				sendError(requestPath, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				log.debug(me.getMessage(), me);
+				sendError(contextRelativePath, req, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} else {
 
-			sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+			sendError(contextRelativePath, req, resp, HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
 
@@ -149,11 +156,10 @@ public class RepositoryServlet extends HttpServlet {
 		}
 	}
 
-	private void sendError(String requestPath, HttpServletResponse resp, int status) throws IOException {
+	private void sendError(String requestPath, HttpServletRequest req, HttpServletResponse resp, int status) throws IOException {
 
-		log.info("Status: " + status + " for: " + requestPath);
+		log.info("Returning error to: " + req.getRemoteAddr() + " satus: " + status + " requestPath: " + requestPath);
 
-		PrintWriter writer = resp.getWriter();
 		resp.sendError(status);
 	}
 

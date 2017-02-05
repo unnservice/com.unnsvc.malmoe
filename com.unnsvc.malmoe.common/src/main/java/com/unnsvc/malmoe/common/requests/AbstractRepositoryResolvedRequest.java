@@ -26,4 +26,11 @@ public abstract class AbstractRepositoryResolvedRequest implements IResolvedRequ
 
 		return repositoryId;
 	}
+
+	@Override
+	public String toString() {
+
+		return "AbstractRepositoryResolvedRequest [user=" + user + ", repositoryId=" + repositoryId + "]";
+	}
+
 }

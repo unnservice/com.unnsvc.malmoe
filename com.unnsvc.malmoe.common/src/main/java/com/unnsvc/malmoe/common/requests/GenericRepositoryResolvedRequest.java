@@ -17,4 +17,11 @@ public class GenericRepositoryResolvedRequest extends AbstractRepositoryResolved
 
 		return repoRelativePath;
 	}
+
+	@Override
+	public String toString() {
+
+		return "GenericRepositoryResolvedRequest [repoRelativePath=" + repoRelativePath + ", toString()=" + super.toString() + "]";
+	}
+
 }
