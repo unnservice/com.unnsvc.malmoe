@@ -3,9 +3,6 @@ package com.unnsvc.malmoe.repository;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.unnsvc.malmoe.common.IAccess;
 import com.unnsvc.malmoe.common.IAccessManager;
 import com.unnsvc.malmoe.common.IIdentityManager;
@@ -33,7 +30,7 @@ import com.unnsvc.rhena.common.RhenaConstants;
  */
 public class VirtualRepository implements IMalmoeRepository {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	// private Logger log = LoggerFactory.getLogger(getClass());
 	private File resolverLocation;
 	private IAccessManager accessManager;
 	private IRemoteResolver resolver;
@@ -64,13 +61,13 @@ public class VirtualRepository implements IMalmoeRepository {
 			public IRetrievalResult execute() throws MalmoeException {
 
 				IRetrievalResult result = resolveLocal(request);
-				
+
 				if (result instanceof NotFoundRetrievalResult) {
 					if (resolver != null) {
 						return resolveRemote(request);
 					}
 				}
-				
+
 				return result;
 			}
 

@@ -2,7 +2,10 @@
 package com.unnsvc.malmoe.frontend;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletConfig;
@@ -27,6 +30,7 @@ import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 import com.unnsvc.malmoe.common.requests.RequestResolver;
 import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
 import com.unnsvc.malmoe.common.retrieval.ExecutionsRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.FileRetrievalResult;
 import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
@@ -73,6 +77,12 @@ public class RepositoryServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		String requestPath = req.getRequestURI();
+
+		// sanitise
+		if (requestPath.contains("..")) {
+			sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+		}
+
 		if (requestPath.startsWith(MalmoeConstants.BASE_REPOSITORY_URI)) {
 			String relativePath = requestPath.substring(MalmoeConstants.BASE_REPOSITORY_URI.length());
 
@@ -98,13 +108,16 @@ public class RepositoryServlet extends HttpServlet {
 
 				if (result instanceof ModelRetrievalResult) {
 
-					throw new UnsupportedOperationException("Not implemented");
+					resp.setContentType("application/xml");
+					serveContent(resp, (ModelRetrievalResult) result);
 				} else if (result instanceof ExecutionsRetrievalResult) {
 
-					throw new UnsupportedOperationException("Not implemented");
+					resp.setContentType("application/xml");
+					serveContent(resp, (ModelRetrievalResult) result);
 				} else if (result instanceof ArtifactRetrievalResult) {
 
-					throw new UnsupportedOperationException("Not implemented");
+					resp.setContentType("application/octet-stream");
+					serveContent(resp, (ArtifactRetrievalResult) result);
 				}
 
 			} catch (AccessException ae) {
@@ -117,15 +130,29 @@ public class RepositoryServlet extends HttpServlet {
 
 				sendError(requestPath, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
-		}
+		} else {
 
-		sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+			sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+		}
+	}
+
+	private void serveContent(HttpServletResponse resp, FileRetrievalResult result) throws IOException {
+
+		OutputStream out = resp.getOutputStream();
+		try (InputStream is = new FileInputStream(result.getFile())) {
+
+			int buff = -1;
+			while ((buff = is.read()) != -1) {
+
+				out.write(buff);
+			}
+		}
 	}
 
 	private void sendError(String requestPath, HttpServletResponse resp, int status) throws IOException {
 
 		log.info("Status: " + status + " for: " + requestPath);
-		
+
 		PrintWriter writer = resp.getWriter();
 		resp.sendError(status);
 	}
