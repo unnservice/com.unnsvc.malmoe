@@ -1,5 +1,5 @@
-package com.unnsvc.malmoe.common.exceptions;
 
+package com.unnsvc.malmoe.common.exceptions;
 
 public class NotFoundMalmoeException extends MalmoeException {
 
@@ -8,5 +8,10 @@ public class NotFoundMalmoeException extends MalmoeException {
 	public NotFoundMalmoeException(String message) {
 
 		super(message);
+	}
+
+	public NotFoundMalmoeException(String message, Throwable t) {
+
+		super(message, t);
 	}
 }

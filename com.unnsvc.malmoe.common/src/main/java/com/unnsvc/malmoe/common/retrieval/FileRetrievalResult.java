@@ -3,7 +3,7 @@ package com.unnsvc.malmoe.common.retrieval;
 
 import java.io.File;
 
-public class FileRetrievalResult extends RetrievalResult {
+public class FileRetrievalResult extends ServedRetrievalResult {
 
 	private File resultingFile;
 
@@ -15,5 +15,11 @@ public class FileRetrievalResult extends RetrievalResult {
 	public File getFile() {
 
 		return resultingFile;
+	}
+
+	@Override
+	public String toString() {
+
+		return "FileRetrievalResult [resultingFile=" + resultingFile + "]";
 	}
 }

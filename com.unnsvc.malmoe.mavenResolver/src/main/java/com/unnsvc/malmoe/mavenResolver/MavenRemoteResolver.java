@@ -60,7 +60,12 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		try {
 			File modelFile = new File(moduleLocation, RhenaConstants.MODULE_DESCRIPTOR_FILENAME);
 			if (!modelFile.exists()) {
-				adaptMavenArtifact(request, modelFile, moduleLocation);
+				try {
+					adaptMavenArtifact(request, modelFile, moduleLocation);
+				} catch (Exception ex) {
+					log.debug(ex.getMessage());
+					return new NotFoundRetrievalResult(request);
+				}
 			}
 
 			if (request instanceof ModelRepositoryResolvedRequest) {
@@ -73,8 +78,6 @@ public class MavenRemoteResolver implements IRemoteResolver {
 				File artifactFile = new File(executionTypeLocation, artifactRequest.getArtifactName());
 				if (artifactFile.exists()) {
 					return new ArtifactRetrievalResult(artifactFile);
-				} else {
-					log.debug("Requested artifact does not exist: " + artifactRequest);
 				}
 			}
 
@@ -112,7 +115,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(executionFile))) {
 			writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
-			writer.write("<artifacts xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:execution\">");
+			writer.write("<artifacts xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:artifacts\">");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 
 			GregorianCalendar gc = new GregorianCalendar(TimeZone.getTimeZone("EST"));
@@ -120,13 +123,13 @@ public class MavenRemoteResolver implements IRemoteResolver {
 
 			writer.write("\t<meta date=\"" + convertedDate + "\" />");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
-			
+
 			writer.write("\t<artifact classifier=\"default\">");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
-			
+
 			writer.write("\t\t<primary name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
-			
+
 			writer.write("\t</artifact>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 

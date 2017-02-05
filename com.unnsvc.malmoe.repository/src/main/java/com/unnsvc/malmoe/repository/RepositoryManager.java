@@ -63,6 +63,7 @@ public class RepositoryManager implements IRepositoryManager {
 				}
 			}
 		}
+		
 		throw new MalmoeException("No such repository: " + repositoryName);
 	}
 

@@ -87,8 +87,7 @@ public class MavenDependencyCollector {
 			return collectResult.getRoot();
 		} catch (DependencyCollectionException collectionFailure) {
 
-			log.debug(collectionFailure.getMessage(), collectionFailure);
-			throw new NotFoundMalmoeException(collectionFailure.getMessage());
+			throw new NotFoundMalmoeException(collectionFailure.getMessage(), collectionFailure);
 		}
 	}
 
@@ -106,7 +105,7 @@ public class MavenDependencyCollector {
 
 			return dependencyResult.getRoot();
 		} catch (DependencyResolutionException resolutionFailure) {
-			
+
 			log.debug(resolutionFailure.getMessage(), resolutionFailure);
 			throw new NotFoundMalmoeException(resolutionFailure.getMessage());
 		}

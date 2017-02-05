@@ -3,6 +3,9 @@ package com.unnsvc.malmoe.repository;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.unnsvc.malmoe.common.IAccess;
 import com.unnsvc.malmoe.common.IAccessManager;
 import com.unnsvc.malmoe.common.IIdentityManager;
@@ -30,6 +33,7 @@ import com.unnsvc.rhena.common.RhenaConstants;
  */
 public class VirtualRepository implements IMalmoeRepository {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
 	private File resolverLocation;
 	private IAccessManager accessManager;
 	private IRemoteResolver resolver;
@@ -60,13 +64,13 @@ public class VirtualRepository implements IMalmoeRepository {
 			public IRetrievalResult execute() throws MalmoeException {
 
 				IRetrievalResult result = resolveLocal(request);
-
+				
 				if (result instanceof NotFoundRetrievalResult) {
 					if (resolver != null) {
 						return resolveRemote(request);
 					}
 				}
-
+				
 				return result;
 			}
 
@@ -81,11 +85,11 @@ public class VirtualRepository implements IMalmoeRepository {
 			public IRetrievalResult execute() throws MalmoeException {
 
 				File location = new File(resolverLocation, request.getRepoRelativePath().replace(".", File.separator));
-				if(location.exists() && location.isDirectory()) {
-					
+				if (location.exists() && location.isDirectory()) {
+
 					return new FileRetrievalResult(location);
 				}
-				
+
 				return new NotFoundRetrievalResult(request);
 			}
 		}, IMalmoeRepository.ACCESS_REPOSITORY_READ, IMalmoeRepository.ACCESS_REPOSITORY_LIST);
@@ -119,6 +123,7 @@ public class VirtualRepository implements IMalmoeRepository {
 				ArtifactRepositoryResolvedRequest artifactRequest = (ArtifactRepositoryResolvedRequest) request;
 				File executionTypeLocation = new File(moduleLocation, artifactRequest.getExecutionType().literal());
 				File artifactFile = new File(executionTypeLocation, artifactRequest.getArtifactName());
+
 				if (artifactFile.exists()) {
 					return new ArtifactRetrievalResult(artifactFile);
 				}

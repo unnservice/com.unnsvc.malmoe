@@ -18,4 +18,9 @@ public class NotFoundRetrievalResult implements IRetrievalResult {
 		return request;
 	}
 
+	@Override
+	public String toString() {
+
+		return "NotFoundRetrievalResult [request=" + request + "]";
+	}
 }
