@@ -30,7 +30,7 @@ public class TestRequestResolver {
 	@Test
 	public void testModel() throws RhenaException, MalmoeException {
 
-		resolved = resolver.resolveRequest("/repo1/com/test/artifact/0.0.1/model.xml");
+		resolved = resolver.resolveRequest("/repo1/com/test/artifact/0.0.1/module.xml");
 		Assert.assertTrue(resolved instanceof ModelRepositoryResolvedRequest);
 	}
 	
@@ -45,7 +45,7 @@ public class TestRequestResolver {
 	public void testOtherRepositoryRequest() throws RhenaException, MalmoeException {
 		
 		resolved = resolver.resolveRequest("/repo1/com/test/artifact");
-		ArtifactRepositoryResolvedRequest a = (ArtifactRepositoryResolvedRequest) resolved;
+		GenericRepositoryResolvedRequest a = (GenericRepositoryResolvedRequest) resolved;
 		System.err.println("Resolved is " + resolved.getClass());
 		Assert.assertTrue(resolved instanceof GenericRepositoryResolvedRequest);
 	}

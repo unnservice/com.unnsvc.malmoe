@@ -11,6 +11,7 @@ import com.unnsvc.malmoe.common.IRepositoryManager;
 import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.IUser;
+import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 import com.unnsvc.malmoe.common.visitors.SerialisationVisitor;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
@@ -21,7 +22,7 @@ import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
 public class TestRepositoryManager {
 
-	@Test
+	@Test(expected = MalmoeException.class)
 	public void test() throws Exception {
 
 		File workspaceDirectory = new File("example-repository");

@@ -32,7 +32,7 @@ public class RepositoryManager implements IRepositoryManager {
 		this.workspaceLocation = workspaceLocation;
 		this.identityManager = identityManager;
 		this.repositoriesConfig = repositoriesConfig;
-		this.resolvers = ServiceLoader.load(IRemoteResolverFactory.class);
+		this.resolvers = ServiceLoader.load(IRemoteResolverFactory.class, IRemoteResolverFactory.class.getClassLoader());
 	}
 
 	@Override

@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
@@ -31,6 +33,7 @@ import com.tobedevoured.naether.repo.LogRepositoryListener;
 import com.tobedevoured.naether.repo.LogTransferListener;
 import com.tobedevoured.naether.repo.ManualWagonProvider;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 
 /**
  * @TODO collect sources too
@@ -39,6 +42,7 @@ import com.unnsvc.malmoe.common.exceptions.MalmoeException;
  */
 public class MavenDependencyCollector {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
 	private MavenRepositorySystemSession session;
 	private RepositorySystem repositorySystem;
 	private List<RemoteRepository> remoteRepositories;
@@ -72,28 +76,40 @@ public class MavenDependencyCollector {
 
 	public DependencyNode collectDependencies(String coordinates) throws DependencyCollectionException, MalmoeException {
 
-		CollectRequest collectRequest = createCollectRequest(coordinates);
-		CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
+		try {
+			CollectRequest collectRequest = createCollectRequest(coordinates);
+			CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
 
-		if (collectResult.getRoot().getChildren().isEmpty() || collectResult.getRoot().getChildren().size() != 1) {
-			throw new MalmoeException("Resolved to (" + collectResult.getRoot().getChildren().size() + "): " + collectRequest);
+			if (collectResult.getRoot().getChildren().isEmpty() || collectResult.getRoot().getChildren().size() != 1) {
+				throw new MalmoeException("Resolved to (" + collectResult.getRoot().getChildren().size() + "): " + collectRequest);
+			}
+
+			return collectResult.getRoot();
+		} catch (DependencyCollectionException collectionFailure) {
+
+			log.debug(collectionFailure.getMessage(), collectionFailure);
+			throw new NotFoundMalmoeException(collectionFailure.getMessage());
 		}
-
-		return collectResult.getRoot();
 	}
 
 	public DependencyNode resolveDependencies(String coordinates) throws DependencyResolutionException, MalmoeException {
 
-		CollectRequest collectRequest = createCollectRequest(coordinates);
+		try {
+			CollectRequest collectRequest = createCollectRequest(coordinates);
 
-		DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
-		DependencyResult dependencyResult = repositorySystem.resolveDependencies(session, dependencyRequest);
+			DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
+			DependencyResult dependencyResult = repositorySystem.resolveDependencies(session, dependencyRequest);
 
-		if (dependencyResult.getRoot().getChildren().isEmpty() || dependencyResult.getRoot().getChildren().size() != 1) {
-			throw new MalmoeException("Resolved to (" + dependencyResult.getRoot().getChildren().size() + "): " + collectRequest);
+			if (dependencyResult.getRoot().getChildren().isEmpty() || dependencyResult.getRoot().getChildren().size() != 1) {
+				throw new MalmoeException("Resolved to (" + dependencyResult.getRoot().getChildren().size() + "): " + collectRequest);
+			}
+
+			return dependencyResult.getRoot();
+		} catch (DependencyResolutionException resolutionFailure) {
+			
+			log.debug(resolutionFailure.getMessage(), resolutionFailure);
+			throw new NotFoundMalmoeException(resolutionFailure.getMessage());
 		}
-
-		return dependencyResult.getRoot();
 	}
 
 	private CollectRequest createCollectRequest(String coordinates) {
