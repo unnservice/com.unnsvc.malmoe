@@ -24,14 +24,14 @@ import com.unnsvc.malmoe.common.MalmoeConstants;
 import com.unnsvc.malmoe.common.exceptions.AccessException;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
+import com.unnsvc.malmoe.common.requests.RequestResolver;
+import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ExecutionsRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
-import com.unnsvc.malmoe.repository.requests.RequestResolver;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ExecutionsRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
 
 /**
  * 

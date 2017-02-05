@@ -18,12 +18,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.unnsvc.malmoe</groupId>
-			<artifactId>com.unnsvc.malmoe.malmoeResolver</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.unnsvc.malmoe</groupId>
-			<artifactId>com.unnsvc.malmoe.mavenResolver</artifactId>
+			<artifactId>com.unnsvc.malmoe.repository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

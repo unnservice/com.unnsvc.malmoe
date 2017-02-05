@@ -7,12 +7,12 @@ import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.config.IResolverConfig;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.requests.ArtifactRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.requests.ModelRepositoryResolvedRequest;
 import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
-import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.NotFoundRetrievalResult;
 import com.unnsvc.rhena.common.RhenaConstants;
 
 public class MalmoeRemoteResolver implements IRemoteResolver {

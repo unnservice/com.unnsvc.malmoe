@@ -9,10 +9,10 @@ import org.junit.Test;
 
 import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.requests.ArtifactRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.requests.ModelRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.requests.RequestResolver;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
-import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.RequestResolver;
 import com.unnsvc.rhena.common.RhenaConstants;
 import com.unnsvc.rhena.common.exceptions.RhenaException;
 

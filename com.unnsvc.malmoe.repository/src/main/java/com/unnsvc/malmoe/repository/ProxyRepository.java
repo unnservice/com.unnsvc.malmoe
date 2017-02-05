@@ -10,9 +10,9 @@ import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.config.IReference;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.retrieval.NotFoundRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ServedRetrievalResult;
 import com.unnsvc.malmoe.repository.config.ProxyRepositoryConfig;
-import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ServedRetrievalResult;
 
 public class ProxyRepository implements IMalmoeRepository {
 

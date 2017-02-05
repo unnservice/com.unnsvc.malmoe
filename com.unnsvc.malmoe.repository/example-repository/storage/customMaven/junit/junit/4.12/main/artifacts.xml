@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<artifacts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:rhena:execution">
+	<meta date="2017-02-05" />
+	<artifact name="junit-4.12.jar" sha1="2973D150C0DC1FEFE998F834810D68F278EA58EC" />
+</artifacts>

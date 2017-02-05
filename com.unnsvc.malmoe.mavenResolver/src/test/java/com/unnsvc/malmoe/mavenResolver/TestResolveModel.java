@@ -9,9 +9,8 @@ import org.junit.Test;
 
 import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
-import com.unnsvc.malmoe.repository.identity.AnonymousUser;
-import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
+import com.unnsvc.malmoe.common.requests.ModelRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
 import com.unnsvc.rhena.common.RhenaConstants;
 import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
@@ -23,7 +22,7 @@ public class TestResolveModel extends AbstractMavenResolverTest {
 		MavenRemoteResolver resolver = createResolver();
 
 		ModuleIdentifier identifier = ModuleIdentifier.valueOf("org.hibernate:hibernate-entitymanager:5.2.6.Final");
-		IResolvedArtifactRequest request = new ModelRepositoryResolvedRequest(new AnonymousUser(), "main", identifier);
+		IResolvedArtifactRequest request = new ModelRepositoryResolvedRequest(null, "main", identifier);
 		IRetrievalResult result = resolver.serveRequest(request);
 		Assert.assertTrue(result instanceof ModelRetrievalResult);
 		ModelRetrievalResult modelResult = (ModelRetrievalResult) result;

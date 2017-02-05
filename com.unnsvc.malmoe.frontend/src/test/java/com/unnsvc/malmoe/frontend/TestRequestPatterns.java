@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.requests.RequestResolver;
 import com.unnsvc.malmoe.repository.identity.AnonymousUser;
-import com.unnsvc.malmoe.repository.requests.RequestResolver;
 
 /**
  * /<repoName>/<com/ponent/Name>/<moduleName>/<version>/ /model.xml

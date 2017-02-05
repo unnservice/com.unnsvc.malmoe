@@ -11,15 +11,15 @@ import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
 import com.unnsvc.malmoe.common.IResolvedRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
 import com.unnsvc.malmoe.common.exceptions.MalmoeException;
+import com.unnsvc.malmoe.common.requests.ArtifactRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.requests.GenericRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.requests.ModelRepositoryResolvedRequest;
 import com.unnsvc.malmoe.common.resolver.IRemoteResolver;
+import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.FileRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
+import com.unnsvc.malmoe.common.retrieval.NotFoundRetrievalResult;
 import com.unnsvc.malmoe.repository.config.VirtualRepositoryConfig;
-import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.GenericRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.requests.ModelRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.FileRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.ModelRetrievalResult;
-import com.unnsvc.malmoe.repository.retrieval.NotFoundRetrievalResult;
 import com.unnsvc.rhena.common.RhenaConstants;
 
 /**

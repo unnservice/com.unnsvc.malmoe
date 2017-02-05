@@ -25,7 +25,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.unnsvc.malmoe</groupId>
-			<artifactId>com.unnsvc.malmoe.repository</artifactId>
+			<artifactId>com.unnsvc.malmoe.common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

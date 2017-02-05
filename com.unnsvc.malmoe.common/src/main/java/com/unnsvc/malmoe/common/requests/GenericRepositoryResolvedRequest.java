@@ -1,5 +1,5 @@
 
-package com.unnsvc.malmoe.repository.requests;
+package com.unnsvc.malmoe.common.requests;
 
 import com.unnsvc.malmoe.common.IUser;
 

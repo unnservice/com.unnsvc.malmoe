@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
 import com.unnsvc.malmoe.common.IRetrievalResult;
-import com.unnsvc.malmoe.repository.requests.ArtifactRepositoryResolvedRequest;
-import com.unnsvc.malmoe.repository.retrieval.ArtifactRetrievalResult;
+import com.unnsvc.malmoe.common.requests.ArtifactRepositoryResolvedRequest;
+import com.unnsvc.malmoe.common.retrieval.ArtifactRetrievalResult;
 import com.unnsvc.rhena.common.execution.EExecutionType;
 import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 

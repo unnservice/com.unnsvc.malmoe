@@ -1,5 +1,5 @@
 
-package com.unnsvc.malmoe.repository.retrieval;
+package com.unnsvc.malmoe.common.retrieval;
 
 import java.io.File;
 
