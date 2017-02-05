@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -13,6 +12,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.DependencyNode;
 
@@ -32,6 +33,7 @@ import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
 public class MavenRemoteResolver implements IRemoteResolver {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
 	private IResolverConfig resolverConfig;
 	private File resolverLocation;
 
@@ -71,6 +73,8 @@ public class MavenRemoteResolver implements IRemoteResolver {
 				File artifactFile = new File(executionTypeLocation, artifactRequest.getArtifactName());
 				if (artifactFile.exists()) {
 					return new ArtifactRetrievalResult(artifactFile);
+				} else {
+					log.debug("Requested artifact does not exist: " + artifactRequest);
 				}
 			}
 

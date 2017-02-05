@@ -35,7 +35,7 @@ public class TestRepositoryManager {
 
 		workspaceDirectory = new File("example-repository");
 		config = new MalmoeConfigurationParser(workspaceDirectory);
-		debugConfig(config);
+//		debugConfig(config);
 
 		identityManager = new IdentityManager(config.getIdentityConfig());
 		user = identityManager.authenticate("admin", "password");
@@ -68,7 +68,7 @@ public class TestRepositoryManager {
 	public void testValidIdentifierValidArtifact() throws MalmoeException, RhenaException {
 
 		ModuleIdentifier identifier = ModuleIdentifier.valueOf("junit:junit:4.12");
-		IResolvedArtifactRequest request = new ArtifactRepositoryResolvedRequest(user, "main", identifier, EExecutionType.ITEST, "artifacts.xml");
+		IResolvedArtifactRequest request = new ArtifactRepositoryResolvedRequest(user, "main", identifier, EExecutionType.MAIN, "artifacts.xml");
 
 		IRepositoryManager manager = new RepositoryManager(workspaceDirectory, identityManager, config.getRepositoriesConfig());
 		IRetrievalResult result = manager.serveRequest(request);
@@ -79,6 +79,6 @@ public class TestRepositoryManager {
 
 		SerialisationVisitor visitor = new SerialisationVisitor();
 		config.visit(visitor);
-		System.err.println(visitor.toString());
+//		System.err.println(visitor.toString());
 	}
 }

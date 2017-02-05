@@ -12,7 +12,8 @@ public class ArtifactRepositoryResolvedRequest extends AbstractRepositoryResolve
 	private EExecutionType executionType;
 	private String artifactName;
 
-	public ArtifactRepositoryResolvedRequest(IUser user, String repositoryId, ModuleIdentifier moduleIdentifier, EExecutionType executionType, String artifactName) {
+	public ArtifactRepositoryResolvedRequest(IUser user, String repositoryId, ModuleIdentifier moduleIdentifier, EExecutionType executionType,
+			String artifactName) {
 
 		super(user, repositoryId);
 		this.moduleIdentifier = moduleIdentifier;
@@ -34,4 +35,12 @@ public class ArtifactRepositoryResolvedRequest extends AbstractRepositoryResolve
 
 		return artifactName;
 	}
+
+	@Override
+	public String toString() {
+
+		return "ArtifactRepositoryResolvedRequest [moduleIdentifier=" + moduleIdentifier + ", executionType=" + executionType + ", artifactName=" + artifactName
+				+ "]";
+	}
+
 }
