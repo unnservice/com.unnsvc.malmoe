@@ -21,6 +21,12 @@
 		<xs:attribute name="salt" use="required" type="xs:string" />
 	</xs:complexType>
 
+	<xs:complexType name="anonymousType">
+		<xs:sequence>
+			<xs:element name="group" type="tns:refType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="identityType">
 		<xs:sequence>
 			<xs:element name="groups" minOccurs="1" maxOccurs="1">
@@ -33,7 +39,8 @@
 			<xs:element name="users" minOccurs="1" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="user" type="tns:userType" minOccurs="1" maxOccurs="unbounded" />
+						<xs:element name="anonymous" type="tns:anonymousType" minOccurs="1" maxOccurs="1" />
+						<xs:element name="user" type="tns:userType" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>

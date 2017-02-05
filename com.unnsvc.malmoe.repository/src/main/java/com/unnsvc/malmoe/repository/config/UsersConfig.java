@@ -21,9 +21,13 @@ public class UsersConfig implements IUsersConfig {
 		this.userConfigs = new ArrayList<IUserConfig>();
 
 		for (Node child : Utils.getNodeChildren(node)) {
-
-			UserConfig userConfig = new UserConfig(child);
-			userConfigs.add(userConfig);
+			if (child.getLocalName().equals("anonymous")) {
+				AnonymousConfig userConfig = new AnonymousConfig(child);
+				userConfigs.add(userConfig);
+			} else {
+				UserConfig userConfig = new UserConfig(child);
+				userConfigs.add(userConfig);
+			}
 		}
 	}
 

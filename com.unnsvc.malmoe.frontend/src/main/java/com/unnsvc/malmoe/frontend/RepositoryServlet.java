@@ -33,7 +33,6 @@ import com.unnsvc.malmoe.common.retrieval.ModelRetrievalResult;
 import com.unnsvc.malmoe.repository.IdentityManager;
 import com.unnsvc.malmoe.repository.RepositoryManager;
 import com.unnsvc.malmoe.repository.config.MalmoeConfigurationParser;
-import com.unnsvc.malmoe.repository.identity.AnonymousUser;
 import com.unnsvc.rhena.common.RhenaConstants;
 
 /**
@@ -78,7 +77,7 @@ public class RepositoryServlet extends HttpServlet {
 
 		String contextRelativePath = req.getRequestURI().substring(req.getServletContext().getContextPath().length());
 		log.debug("Request path " + contextRelativePath);
-		
+
 		// sanitise
 		if (contextRelativePath.contains("..")) {
 			sendError(contextRelativePath, req, resp, HttpServletResponse.SC_NOT_FOUND);
@@ -167,10 +166,13 @@ public class RepositoryServlet extends HttpServlet {
 
 		String username = req.getHeader(MalmoeHttpConstants.HEADER_USERNAME);
 		String password = req.getHeader(MalmoeHttpConstants.HEADER_PASSWORD);
-		if (username != null && password != null) {
+		try {
 			IUser user = identityManager.authenticate(username, password);
 			return user;
+		} catch (AccessException ae) {
+			log.debug(ae.getMessage() + ", trying anonymous user instead");
+			IUser anonymous = identityManager.authenticate(MalmoeConstants.ANONYMOUS_USER, null);
+			return anonymous;
 		}
-		return new AnonymousUser();
 	}
 }
