@@ -6,6 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.sonatype.aether.artifact.Artifact;
@@ -90,7 +95,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		produceExecutionFromMavenCollection(moduleLocation, artifactNode.getChildren().get(0));
 	}
 
-	private void produceExecutionFromMavenCollection(File moduleLocation, DependencyNode artifactNode) throws IOException {
+	private void produceExecutionFromMavenCollection(File moduleLocation, DependencyNode artifactNode) throws IOException, DatatypeConfigurationException {
 
 		File executionTypeLocation = new File(moduleLocation, "main");
 		if (!executionTypeLocation.isDirectory()) {
@@ -106,17 +111,26 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			writer.write("<artifacts xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:execution\">");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 
-			writer.write("\t<meta date=\"" + new Date(System.currentTimeMillis()).toString() + "\" />");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
+			GregorianCalendar gc = new GregorianCalendar(TimeZone.getTimeZone("EST"));
+			String convertedDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gc).toXMLFormat();
 
-			writer.write("\t<artifact name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+			writer.write("\t<meta date=\"" + convertedDate + "\" />");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+			
+			writer.write("\t<artifact classifier=\"default\">");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+			
+			writer.write("\t\t<primary name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+			
+			writer.write("\t</artifact>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 
 			writer.write("</artifacts>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 		}
 
-		File artifactLocation =  new File(executionTypeLocation, artifact.getFile().getName());
+		File artifactLocation = new File(executionTypeLocation, artifact.getFile().getName());
 		FileUtils.copyFile(artifact.getFile(), artifactLocation);
 	}
 
