@@ -3,12 +3,16 @@ package com.unnsvc.malmoe.frontend;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unnsvc.malmoe.common.IIdentityManager;
 import com.unnsvc.malmoe.common.IMalmoeConfiguration;
@@ -39,6 +43,7 @@ public class RepositoryServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	private Logger log = LoggerFactory.getLogger(getClass());
 	private IMalmoeConfiguration malmoeConfig;
 	private IIdentityManager identityManager;
 	private IRepositoryManager repositoryManager;
@@ -59,6 +64,7 @@ public class RepositoryServlet extends HttpServlet {
 			identityManager = new IdentityManager(malmoeConfig.getIdentityConfig());
 			repositoryManager = new RepositoryManager(malmoeHome, identityManager, malmoeConfig.getRepositoriesConfig());
 		} catch (MalmoeException e) {
+			log.error(e.getMessage(), e);
 			throw new ServletException(e.getMessage(), e);
 		}
 	}
@@ -103,17 +109,25 @@ public class RepositoryServlet extends HttpServlet {
 
 			} catch (AccessException ae) {
 
-				resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+				sendError(requestPath, resp, HttpServletResponse.SC_FORBIDDEN);
 			} catch (NotFoundMalmoeException nfe) {
 
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+				sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
 			} catch (MalmoeException me) {
 
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				sendError(requestPath, resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		}
 
-		resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		sendError(requestPath, resp, HttpServletResponse.SC_NOT_FOUND);
+	}
+
+	private void sendError(String requestPath, HttpServletResponse resp, int status) throws IOException {
+
+		log.info("Status: " + status + " for: " + requestPath);
+		
+		PrintWriter writer = resp.getWriter();
+		resp.sendError(status);
 	}
 
 	private IUser requestToUser(HttpServletRequest req) throws AccessException {
