@@ -23,18 +23,18 @@ public class TestMavenResolution {
 
 		MavenDependencyCollector collector = new MavenDependencyCollector();
 
-		String groupId = "com.twelvemonkeys.imageio";
-		String artifactId = "imageio-core";
-		String version = "3.3.2";
+		String groupId = "junit";
+		String artifactId = "junit";
+		String version = "4.12";
 
 		collector.addRepository(new URL("http://central.maven.org/maven2/"));
 		collector.addDependency(groupId, artifactId, null, "jar", version);
 		collector.addDependency(groupId, artifactId, "sources", "jar", version);
 		collector.addDependency(groupId, artifactId, "javadoc", "jar", version);
 
-		for (DependencyNode child : collector.collectDependencies().getChildren()) {
-			child.accept(new MavenDependencyDebugVisitor("collection"));
-		}
+//		for (DependencyNode child : collector.collectDependencies().getChildren()) {
+//			child.accept(new MavenDependencyDebugVisitor("collection"));
+//		}
 
 		log.info("");
 

@@ -94,13 +94,19 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		MavenDependencyCollector coll = new MavenDependencyCollector();
 		coll.addRepository(resolverConfig.getUrl());
 
-		String coordinates = identifierToCoordinates(request.getIdentifier(), "jar");
+		String groupId = request.getIdentifier().getComponentName().toString();
+		String artifactId = request.getIdentifier().getModuleName().toString();
+		String version = request.getIdentifier().getVersion().toString();
 
-		DependencyNode node = coll.collectDependencies(coordinates);
-		produceModelFromMavenCollection(modelFile, request.getIdentifier(), node.getChildren().get(0), moduleLocation);
+		coll.addDependency(groupId, artifactId, "", "jar", version);
+		coll.addDependency(groupId, artifactId, "sources", "jar", version);
+		coll.addDependency(groupId, artifactId, "javadoc", "jar", version);
 
-		DependencyNode artifactNode = coll.resolveDependencies(coordinates);
-		produceExecutionFromMavenCollection(moduleLocation, artifactNode.getChildren().get(0));
+		DependencyNode collectionRoot = coll.collectDependencies();
+		produceModelFromMavenCollection(modelFile, request.getIdentifier(), collectionRoot, moduleLocation);
+
+		DependencyNode resolutionNode = coll.resolveDependencies();
+		produceExecutionFromMavenCollection(moduleLocation, resolutionNode);
 	}
 
 	private void produceExecutionFromMavenCollection(File moduleLocation, DependencyNode artifactNode) throws IOException, DatatypeConfigurationException {
@@ -109,8 +115,6 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		if (!executionTypeLocation.isDirectory()) {
 			executionTypeLocation.mkdirs();
 		}
-
-		Artifact artifact = artifactNode.getDependency().getArtifact();
 
 		File executionFile = new File(executionTypeLocation, RhenaConstants.ARTIFACTS_DESCRIPTOR_FILENAME);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(executionFile))) {
@@ -128,8 +132,21 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			writer.write("\t<artifact classifier=\"default\">");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 
-			writer.write("\t\t<primary name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
+			for (DependencyNode childNode : artifactNode.getChildren()) {
+				Artifact artifact = childNode.getDependency().getArtifact();
+				// Copy in place
+				File artifactLocation = new File(executionTypeLocation, artifact.getFile().getName());
+				FileUtils.copyFile(artifact.getFile(), artifactLocation);
+
+				if (artifact.getClassifier().isEmpty()) {
+					writer.write("\t\t<primary name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+				} else if (artifact.getClassifier().equals("sources")) {
+					writer.write("\t\t<sources name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+				} else if (artifact.getClassifier().equals("javadoc")) {
+					writer.write("\t\t<javadoc name=\"" + artifact.getFile().getName() + "\" sha1=\"" + Utils.generateSha1(artifact.getFile()) + "\" />");
+				}
+				writer.write(RhenaConstants.LINE_SEPARATOR);
+			}
 
 			writer.write("\t</artifact>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
@@ -137,19 +154,6 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			writer.write("</artifacts>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 		}
-
-		File artifactLocation = new File(executionTypeLocation, artifact.getFile().getName());
-		FileUtils.copyFile(artifact.getFile(), artifactLocation);
-	}
-
-	private String identifierToCoordinates(ModuleIdentifier identifier, String artifactType) {
-
-		StringBuilder coordinates = new StringBuilder();
-		coordinates.append(identifier.getComponentName().toString()).append(":");
-		coordinates.append(identifier.getModuleName().toString()).append(":");
-		coordinates.append(artifactType).append(":");
-		coordinates.append(identifier.getVersion().toString());
-		return coordinates.toString();
 	}
 
 	/**
@@ -174,24 +178,25 @@ public class MavenRemoteResolver implements IRemoteResolver {
 
 			for (DependencyNode child : node.getChildren()) {
 
-				Artifact artifact = child.getDependency().getArtifact();
-				writer.write("\t<dependency:main module=\"" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + "\" />");
-				writer.write(RhenaConstants.LINE_SEPARATOR);
+				/**
+				 * Only care about the dependencies of the null classifier
+				 * (default)
+				 */
+				if (child.getDependency().getArtifact().getClassifier().isEmpty()) {
+
+					for (DependencyNode dep : child.getChildren()) {
+						Artifact artifact = dep.getDependency().getArtifact();
+						writer.write("\t<dependency:main module=\"" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + "\" />");
+						writer.write(RhenaConstants.LINE_SEPARATOR);
+					}
+					break;
+				} else {
+					System.err.println("Classifier was: " + child.getDependency().getArtifact().getClassifier());
+				}
 			}
 
 			writer.write("</module>");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 		}
 	}
-
-	private String toNotation(ModuleIdentifier identifier) {
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(identifier.getComponentName().toString()).append(":");
-		sb.append(identifier.getModuleName().toString()).append(":");
-		sb.append("jar").append(":");
-		sb.append(identifier.getVersion().toString());
-		return sb.toString();
-	}
-
 }
