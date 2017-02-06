@@ -5,7 +5,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -15,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
 
 import com.unnsvc.malmoe.common.IResolvedArtifactRequest;
@@ -98,18 +101,78 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		String artifactId = request.getIdentifier().getModuleName().toString();
 		String version = request.getIdentifier().getVersion().toString();
 
-		coll.addDependency(groupId, artifactId, "", "jar", version);
-		coll.addDependency(groupId, artifactId, "sources", "jar", version);
-		coll.addDependency(groupId, artifactId, "javadoc", "jar", version);
+		Dependency primaryDependency = coll.createDependency(groupId, artifactId, "", "jar", version);
+		Dependency sourcesDependency = coll.createDependency(groupId, artifactId, "sources", "jar", version);
+		Dependency javadocDependency = coll.createDependency(groupId, artifactId, "javadoc", "jar", version);
 
-		DependencyNode collectionRoot = coll.collectDependencies();
-		produceModelFromMavenCollection(modelFile, request.getIdentifier(), collectionRoot, moduleLocation);
+		List<DependencyNode> dependencyNodes = new ArrayList<DependencyNode>();
+		DependencyNode primaryDependencyNode = coll.resolveDependencies(primaryDependency).getChildren().get(0);
+		dependencyNodes.add(primaryDependencyNode);
 
-		DependencyNode resolutionNode = coll.resolveDependencies();
-		produceExecutionFromMavenCollection(moduleLocation, resolutionNode);
+		try {
+			DependencyNode sourcesDependencyNode = coll.resolveDependencies(sourcesDependency).getChildren().get(0);
+			if (sourcesDependencyNode != null) {
+				dependencyNodes.add(sourcesDependencyNode);
+			}
+		} catch (Exception ex) {
+			log.trace(ex.getMessage(), ex);
+		}
+
+		try {
+			DependencyNode javadocDependencyNode = coll.resolveDependencies(javadocDependency).getChildren().get(0);
+			if (javadocDependencyNode != null) {
+				dependencyNodes.add(javadocDependencyNode);
+			}
+		} catch (Exception ex) {
+			log.trace(ex.getMessage(), ex);
+		}
+
+		produceModelFromMavenCollection(modelFile, request.getIdentifier(), dependencyNodes, moduleLocation);
+		produceExecutionFromMavenCollection(moduleLocation, dependencyNodes);
 	}
 
-	private void produceExecutionFromMavenCollection(File moduleLocation, DependencyNode artifactNode) throws IOException, DatatypeConfigurationException {
+	/**
+	 * @param identifier
+	 * @param set
+	 * @TODO Need to build models too
+	 * @param dependenciesGraph
+	 * @throws IOException
+	 */
+	private void produceModelFromMavenCollection(File modelFile, ModuleIdentifier identifier, List<DependencyNode> dependencyNodes, File versionLocation)
+			throws IOException {
+
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {
+
+			writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+			writer.write("<module xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:module\" xmlns:prop=\"urn:rhena:properties\" ");
+			writer.write("xmlns:dependency=\"urn:rhena:dependency\" xsi:schemaLocation=\"urn:rhena:module http://schema.unnsvc.com/rhena/module.xsd\">");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+
+			writer.write("\t<meta component=\"" + identifier.getComponentName().toString() + "\" version=\"" + identifier.getVersion().toString() + "\" />");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+
+			for (DependencyNode child : dependencyNodes) {
+
+				if (child.getDependency().getArtifact().getClassifier().isEmpty()) {
+
+					for (DependencyNode dep : child.getChildren()) {
+						Artifact artifact = dep.getDependency().getArtifact();
+						writer.write("\t<dependency:main module=\"" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion()
+								+ "\" />");
+						writer.write(RhenaConstants.LINE_SEPARATOR);
+					}
+					break;
+				}
+			}
+
+			writer.write("</module>");
+			writer.write(RhenaConstants.LINE_SEPARATOR);
+		}
+	}
+
+	private void produceExecutionFromMavenCollection(File moduleLocation, List<DependencyNode> dependencyNodes)
+			throws IOException, DatatypeConfigurationException {
 
 		File executionTypeLocation = new File(moduleLocation, "main");
 		if (!executionTypeLocation.isDirectory()) {
@@ -132,7 +195,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 			writer.write("\t<artifact classifier=\"default\">");
 			writer.write(RhenaConstants.LINE_SEPARATOR);
 
-			for (DependencyNode childNode : artifactNode.getChildren()) {
+			for (DependencyNode childNode : dependencyNodes) {
 				Artifact artifact = childNode.getDependency().getArtifact();
 				// Copy in place
 				File artifactLocation = new File(executionTypeLocation, artifact.getFile().getName());
@@ -156,47 +219,4 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		}
 	}
 
-	/**
-	 * @param identifier
-	 * @param set
-	 * @TODO Need to build models too
-	 * @param dependenciesGraph
-	 * @throws IOException
-	 */
-	private void produceModelFromMavenCollection(File modelFile, ModuleIdentifier identifier, DependencyNode node, File versionLocation) throws IOException {
-
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(modelFile))) {
-
-			writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
-			writer.write("<module xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"urn:rhena:module\" xmlns:prop=\"urn:rhena:properties\" ");
-			writer.write("xmlns:dependency=\"urn:rhena:dependency\" xsi:schemaLocation=\"urn:rhena:module http://schema.unnsvc.com/rhena/module.xsd\">");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
-
-			writer.write("\t<meta component=\"" + identifier.getComponentName().toString() + "\" version=\"" + identifier.getVersion().toString() + "\" />");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
-
-			for (DependencyNode child : node.getChildren()) {
-
-				/**
-				 * Only care about the dependencies of the null classifier
-				 * (default)
-				 */
-				if (child.getDependency().getArtifact().getClassifier().isEmpty()) {
-
-					for (DependencyNode dep : child.getChildren()) {
-						Artifact artifact = dep.getDependency().getArtifact();
-						writer.write("\t<dependency:main module=\"" + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + "\" />");
-						writer.write(RhenaConstants.LINE_SEPARATOR);
-					}
-					break;
-				} else {
-					System.err.println("Classifier was: " + child.getDependency().getArtifact().getClassifier());
-				}
-			}
-
-			writer.write("</module>");
-			writer.write(RhenaConstants.LINE_SEPARATOR);
-		}
-	}
 }

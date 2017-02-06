@@ -4,6 +4,7 @@ package com.unnsvc.malmoe.mavenResolver;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.repository.internal.DefaultServiceLocator;
@@ -85,10 +86,10 @@ public class MavenDependencyCollector {
 		remoteRepositories.add(new RemoteRepository(repositoryLocation.hashCode() + "", "default", repositoryLocation.toString()));
 	}
 
-	public DependencyNode collectDependencies() throws DependencyCollectionException, MalmoeException {
+	public DependencyNode collectDependencies(Dependency dependency) throws DependencyCollectionException, MalmoeException {
 
 		try {
-			CollectRequest collectRequest = createCollectRequest();
+			CollectRequest collectRequest = createCollectRequest(dependency);
 			CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
 
 			if (collectResult.getRoot().getChildren().isEmpty()) {
@@ -102,10 +103,10 @@ public class MavenDependencyCollector {
 		}
 	}
 
-	public DependencyNode resolveDependencies() throws DependencyResolutionException, MalmoeException {
+	public DependencyNode resolveDependencies(Dependency dependency) throws DependencyResolutionException, MalmoeException {
 
 		try {
-			CollectRequest collectRequest = createCollectRequest();
+			CollectRequest collectRequest = createCollectRequest(dependency);
 
 			DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
 			DependencyResult dependencyResult = repositorySystem.resolveDependencies(session, dependencyRequest);
@@ -122,7 +123,7 @@ public class MavenDependencyCollector {
 		}
 	}
 
-	private CollectRequest createCollectRequest() {
+	private CollectRequest createCollectRequest(Dependency dependency) {
 
 		CollectRequest collectRequest = new CollectRequest();
 
@@ -130,23 +131,24 @@ public class MavenDependencyCollector {
 			collectRequest.addRepository(remoteRepo);
 		}
 
-		collectRequest.setDependencies(dependencies);
+		collectRequest.setDependencies(Collections.singletonList(dependency));
+
 		return collectRequest;
 	}
 
-	public void addDependency(String groupId, String artifactId, String classifier, String extension, String version) {
+	public Dependency createDependency(String groupId, String artifactId, String classifier, String extension, String version) {
 
 		// Declaring the artifact type was to resolve test-jar, but this will
 		// maybe be implemented at some later point
 		// ArtifactType type = new DefaultArtifactType(artifactType);
 		DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, classifier, extension, version);
 		Dependency dependency = new Dependency(artifact, "runtime");
-		this.dependencies.add(dependency);
+		return dependency;
 	}
 
-	public void addDependency(String groupId, String artifactId, String version) {
+	public Dependency createDependency(String groupId, String artifactId, String version) {
 
-		this.addDependency(groupId, artifactId, null, "jar", version);
+		return createDependency(groupId, artifactId, null, "jar", version);
 	}
 
 	private File getLocalRepoPath() {
