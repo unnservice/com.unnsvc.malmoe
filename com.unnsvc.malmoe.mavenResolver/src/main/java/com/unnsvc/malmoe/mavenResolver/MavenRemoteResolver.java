@@ -33,6 +33,7 @@ import com.unnsvc.rhena.common.identity.ModuleIdentifier;
 
 public class MavenRemoteResolver implements IRemoteResolver {
 
+	public static String DEFAULT_MAVEN_LOCALREPO_PROP = "malmoe.resolver.maven.home";
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private IResolverConfig resolverConfig;
 	private File resolverLocation;
@@ -90,7 +91,7 @@ public class MavenRemoteResolver implements IRemoteResolver {
 
 	private void adaptMavenArtifact(IResolvedArtifactRequest request, File modelFile, File moduleLocation) throws Exception {
 
-		MavenDependencyCollector coll = new MavenDependencyCollector(getLocalRepoPath());
+		MavenDependencyCollector coll = new MavenDependencyCollector();
 		coll.addRepository(resolverConfig.getUrl());
 
 		String coordinates = identifierToCoordinates(request.getIdentifier(), "jar");
@@ -149,16 +150,6 @@ public class MavenRemoteResolver implements IRemoteResolver {
 		coordinates.append(artifactType).append(":");
 		coordinates.append(identifier.getVersion().toString());
 		return coordinates.toString();
-	}
-
-	private File getLocalRepoPath() {
-
-		String m2Repo = System.getProperty("malmoe.resolver.maven.home");
-		if (m2Repo == null) {
-			String userHome = System.getProperty("user.home");
-			return new File(userHome + File.separator + ".m2" + File.separator + "repository");
-		}
-		return (new File(m2Repo)).getAbsoluteFile();
 	}
 
 	/**

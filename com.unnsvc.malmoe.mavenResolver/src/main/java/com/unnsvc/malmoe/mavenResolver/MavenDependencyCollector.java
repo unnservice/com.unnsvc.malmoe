@@ -4,7 +4,6 @@ package com.unnsvc.malmoe.mavenResolver;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.repository.internal.DefaultServiceLocator;
@@ -36,7 +35,8 @@ import com.unnsvc.malmoe.common.exceptions.MalmoeException;
 import com.unnsvc.malmoe.common.exceptions.NotFoundMalmoeException;
 
 /**
- * @TODO collect sources too
+ * Maven adapter which collects and resolves maven dependencies
+ * 
  * @author noname
  *
  */
@@ -46,9 +46,15 @@ public class MavenDependencyCollector {
 	private MavenRepositorySystemSession session;
 	private RepositorySystem repositorySystem;
 	private List<RemoteRepository> remoteRepositories;
+	private List<Dependency> dependencies;
 
-	public MavenDependencyCollector(File mavenLocalRepository) throws Exception {
+	public MavenDependencyCollector(File mavenLocalRepository) {
 
+		if (mavenLocalRepository == null) {
+			mavenLocalRepository = getLocalRepoPath();
+		}
+
+		this.dependencies = new ArrayList<Dependency>();
 		this.remoteRepositories = new ArrayList<RemoteRepository>();
 
 		DefaultServiceLocator locator = new DefaultServiceLocator();
@@ -69,18 +75,23 @@ public class MavenDependencyCollector {
 		session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(localRepo));
 	}
 
+	public MavenDependencyCollector() {
+
+		this(null);
+	}
+
 	public void addRepository(URL repositoryLocation) {
 
 		remoteRepositories.add(new RemoteRepository(repositoryLocation.hashCode() + "", "default", repositoryLocation.toString()));
 	}
 
-	public DependencyNode collectDependencies(String coordinates) throws DependencyCollectionException, MalmoeException {
+	public DependencyNode collectDependencies() throws DependencyCollectionException, MalmoeException {
 
 		try {
-			CollectRequest collectRequest = createCollectRequest(coordinates);
+			CollectRequest collectRequest = createCollectRequest();
 			CollectResult collectResult = repositorySystem.collectDependencies(session, collectRequest);
 
-			if (collectResult.getRoot().getChildren().isEmpty() || collectResult.getRoot().getChildren().size() != 1) {
+			if (collectResult.getRoot().getChildren().isEmpty()) {
 				throw new MalmoeException("Resolved to (" + collectResult.getRoot().getChildren().size() + "): " + collectRequest);
 			}
 
@@ -91,15 +102,15 @@ public class MavenDependencyCollector {
 		}
 	}
 
-	public DependencyNode resolveDependencies(String coordinates) throws DependencyResolutionException, MalmoeException {
+	public DependencyNode resolveDependencies() throws DependencyResolutionException, MalmoeException {
 
 		try {
-			CollectRequest collectRequest = createCollectRequest(coordinates);
+			CollectRequest collectRequest = createCollectRequest();
 
 			DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
 			DependencyResult dependencyResult = repositorySystem.resolveDependencies(session, dependencyRequest);
 
-			if (dependencyResult.getRoot().getChildren().isEmpty() || dependencyResult.getRoot().getChildren().size() != 1) {
+			if (dependencyResult.getRoot().getChildren().isEmpty()) {
 				throw new MalmoeException("Resolved to (" + dependencyResult.getRoot().getChildren().size() + "): " + collectRequest);
 			}
 
@@ -111,7 +122,7 @@ public class MavenDependencyCollector {
 		}
 	}
 
-	private CollectRequest createCollectRequest(String coordinates) {
+	private CollectRequest createCollectRequest() {
 
 		CollectRequest collectRequest = new CollectRequest();
 
@@ -119,15 +130,32 @@ public class MavenDependencyCollector {
 			collectRequest.addRepository(remoteRepo);
 		}
 
-		collectRequest.setDependencies(createDependency(coordinates, "compile"));
+		collectRequest.setDependencies(dependencies);
 		return collectRequest;
 	}
 
-	private List<Dependency> createDependency(String notation, String scope) {
+	public void addDependency(String groupId, String artifactId, String classifier, String extension, String version) {
 
-		DefaultArtifact artifact = new DefaultArtifact(notation);
+		// Declaring the artifact type was to resolve test-jar, but this will
+		// maybe be implemented at some later point
+		// ArtifactType type = new DefaultArtifactType(artifactType);
+		DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, classifier, extension, version);
+		Dependency dependency = new Dependency(artifact, "runtime");
+		this.dependencies.add(dependency);
+	}
 
-		Dependency dependency = new Dependency(artifact, scope);
-		return new ArrayList<Dependency>(Collections.singletonList(dependency));
+	public void addDependency(String groupId, String artifactId, String version) {
+
+		this.addDependency(groupId, artifactId, null, "jar", version);
+	}
+
+	private File getLocalRepoPath() {
+
+		String m2Repo = System.getProperty(MavenRemoteResolver.DEFAULT_MAVEN_LOCALREPO_PROP);
+		if (m2Repo == null) {
+			String userHome = System.getProperty("user.home");
+			return new File(userHome + File.separator + ".m2" + File.separator + "repository");
+		}
+		return (new File(m2Repo)).getAbsoluteFile();
 	}
 }
